@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Receipt Flow - Camera Viewfinder</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container-highest": "#e1e3e4",
+              "inverse-primary": "#66dd8b",
+              "on-error": "#ffffff",
+              "on-tertiary-fixed": "#2f1500",
+              "inverse-on-surface": "#f0f1f2",
+              "outline-variant": "#bdcabc",
+              "secondary": "#446464",
+              "secondary-container": "#c6e9e9",
+              "surface-container-low": "#f3f4f5",
+              "on-primary": "#ffffff",
+              "surface-bright": "#f8f9fa",
+              "primary-fixed-dim": "#66dd8b",
+              "primary": "#006d36",
+              "surface-container": "#edeeef",
+              "surface-tint": "#006d36",
+              "tertiary-fixed-dim": "#ffb77d",
+              "secondary-fixed": "#c6e9e9",
+              "inverse-surface": "#2e3132",
+              "surface-dim": "#d9dadb",
+              "on-secondary-fixed-variant": "#2c4c4c",
+              "surface-container-high": "#e7e8e9",
+              "background": "#f8f9fa",
+              "on-primary-fixed-variant": "#005227",
+              "error-container": "#ffdad6",
+              "surface": "#f8f9fa",
+              "on-error-container": "#93000a",
+              "secondary-fixed-dim": "#abcdcd",
+              "on-tertiary-fixed-variant": "#6e3900",
+              "on-background": "#191c1d",
+              "tertiary-fixed": "#ffdcc3",
+              "on-secondary-container": "#4a6a6a",
+              "on-tertiary-container": "#6a3700",
+              "primary-container": "#50c878",
+              "outline": "#6e7a6e",
+              "tertiary-container": "#ff993a",
+              "surface-container-lowest": "#ffffff",
+              "tertiary": "#904d00",
+              "error": "#ba1a1a",
+              "on-secondary-fixed": "#002020",
+              "primary-fixed": "#83fba5",
+              "on-surface-variant": "#3e4a3f",
+              "surface-variant": "#e1e3e4",
+              "on-primary-container": "#005025",
+              "on-surface": "#191c1d",
+              "on-secondary": "#ffffff",
+              "on-tertiary": "#ffffff",
+              "on-primary-fixed": "#00210c"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .camera-focus-bracket {
+        background-image: linear-gradient(to right, white 33%, rgba(255,255,255,0) 0%);
+        background-position: bottom;
+        background-size: 15px 2px;
+        background-repeat: repeat-x;
+      }
+      .scan-line {
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #50c878, transparent);
+        box-shadow: 0 0 15px #50c878;
+        top: 20%;
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-black font-body overflow-hidden">
+<!-- Mock Camera Background -->
+<div class="fixed inset-0 z-0">
+<img class="w-full h-full object-cover grayscale brightness-50" data-alt="Top-down perspective of a crumpled white paper receipt lying on a dark, textured slate office desk surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTZRnX8SYtShwgfN1KCgSCy1C1xorsSTfYoiH2RLQvuW8bqo8kpB5coqhp9TsVEjWZvkHYFaYATLZMPzojnG6f5lJrRvaET830KMSOuzjZvCxhAZkfo0eoK-qryi9_Cqp-Cay-AqklDtEi-FN8CxNy0HQGDuiDEObDrvcjoGB70WlYYNROyQYOUb8KfqVMD3vgjSKjZR6mURhNjx2EoJ1KUoN5ggBot96wcy626CbptsQxusw4TcaWdpXphhkfLDpa2rYdJ3jUf1k4"/>
+</div>
+<!-- UI Overlay Canvas -->
+<div class="fixed inset-0 z-10 flex flex-col justify-between">
+<!-- Top Controls: TopAppBar Pattern Implementation -->
+<header class="flex justify-between items-center w-full px-6 py-8 max-w-screen-xl mx-auto z-50">
+<button class="w-12 h-12 flex items-center justify-center rounded-full bg-black/20 backdrop-blur-md text-white hover:bg-black/40 transition-colors">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+<div class="flex items-center gap-4">
+<button class="w-12 h-12 flex items-center justify-center rounded-full bg-black/20 backdrop-blur-md text-white hover:bg-emerald-500/20 transition-colors">
+<span class="material-symbols-outlined" data-icon="flash_on">flash_on</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center rounded-full bg-black/20 backdrop-blur-md text-white hover:bg-black/40 transition-colors">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+</header>
+<!-- Viewfinder/Guide: Specialized Component -->
+<main class="flex-1 flex flex-col items-center justify-center px-8 relative">
+<!-- Scanning Line Animation Simulation (Static for this task) -->
+<div class="absolute w-3/4 scan-line z-20"></div>
+<!-- The Guide Box -->
+<div class="relative w-full max-w-md aspect-[3/4] border-2 border-dashed border-white/40 rounded-3xl flex items-center justify-center overflow-hidden">
+<!-- Corner Accents for high-end feel -->
+<div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-emerald-400 rounded-tl-xl"></div>
+<div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-emerald-400 rounded-tr-xl"></div>
+<div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-emerald-400 rounded-bl-xl"></div>
+<div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-emerald-400 rounded-br-xl"></div>
+<!-- Guidance Text -->
+<div class="text-center space-y-2 pointer-events-none">
+<p class="font-headline font-bold text-white text-lg tracking-tight uppercase">Align Receipt Here</p>
+<p class="font-body text-white/60 text-sm">Ensure all four corners are visible</p>
+</div>
+<!-- Overlay Dimming outside guide (using box-shadow hack for cleaner code) -->
+<div class="absolute inset-0 shadow-[0_0_0_1000px_rgba(0,0,0,0.5)] pointer-events-none"></div>
+</div>
+<!-- Hint Badge -->
+<div class="mt-8 px-5 py-2.5 bg-emerald-900/40 backdrop-blur-xl border border-emerald-500/30 rounded-full flex items-center gap-3">
+<span class="material-symbols-outlined text-emerald-400 text-sm" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-label text-emerald-100 text-[11px] font-semibold uppercase tracking-widest">Auto-Detecting Vendor</span>
+</div>
+</main>
+<!-- Bottom Controls: Camera Toolbar -->
+<footer class="w-full pb-16 pt-8 px-10 flex items-center justify-between max-w-lg mx-auto z-50">
+<!-- Gallery Link -->
+<button class="group flex flex-col items-center gap-2">
+<div class="w-14 h-14 rounded-2xl overflow-hidden border-2 border-white/20 group-hover:border-emerald-400 transition-all p-0.5">
+<img class="w-full h-full object-cover rounded-xl" data-alt="Small square thumbnail preview of a coffee shop receipt on a wooden table" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrP53OCzHHphdyBxuA6yR6NpHj0mwypPGQa5RL362OqQPowXZw2TjG1w7ybacqgxh6kFMSTVBM1hbED9V35Z40nqLVPXF5tJGLgjLAZdN82FCgy_TgnDR1XjHMQ0lxCRWOp2CcBtLS0U5jMDQE_-RTFUxkPbm4g89aMqyJJM1SClySz3CEDHnrU-4ePB7jw6XtBJWZT8AR3HkCQ_hy74RAzydmenVVOmEk4HyQodjiq8tA8faWslo8_m_DkRFVJF4eLszPehAQhTMe"/>
+</div>
+<span class="text-[10px] font-bold text-white/50 uppercase tracking-tighter">Gallery</span>
+</button>
+<!-- Shutter Button -->
+<button class="relative group">
+<div class="absolute inset-0 bg-emerald-500 blur-2xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
+<div class="w-24 h-24 rounded-full border-4 border-white flex items-center justify-center p-1.5 transition-transform active:scale-90 duration-150">
+<div class="w-full h-full rounded-full bg-white shadow-lg flex items-center justify-center">
+<div class="w-16 h-16 rounded-full border border-slate-200"></div>
+</div>
+</div>
+</button>
+<!-- Mode Switcher -->
+<button class="group flex flex-col items-center gap-2">
+<div class="w-14 h-14 flex items-center justify-center rounded-2xl bg-white/10 backdrop-blur-lg group-hover:bg-white/20 transition-all">
+<span class="material-symbols-outlined text-white" data-icon="file_present">file_present</span>
+</div>
+<span class="text-[10px] font-bold text-white/50 uppercase tracking-tighter">Multi-Page</span>
+</button>
+</footer>
+</div>
+<!-- Edge Vignette -->
+<div class="fixed inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)] z-0"></div>
+</body></html>

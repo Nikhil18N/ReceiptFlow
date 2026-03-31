@@ -1,0 +1,55 @@
+{
+  "expo": {
+    "name": "ReceiptFlow",
+    "slug": "receipt-flow",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "receiptflow",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#f8f9fa"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.receiptflow.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "ReceiptFlow needs camera access to scan your receipts.",
+        "NSPhotoLibraryUsageDescription": "ReceiptFlow needs photo library access to import receipts from your gallery.",
+        "NSPhotoLibraryAddUsageDescription": "ReceiptFlow saves scanned receipt images."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#006d36"
+      },
+      "package": "com.receiptflow.app",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "ReceiptFlow needs camera access to scan your receipts."
+        }
+      ],
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
