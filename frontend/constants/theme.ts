@@ -64,9 +64,11 @@ export const Colors = {
 };
 
 export const Fonts = {
-  headline: 'Manrope',
-  body: 'Inter',
-  label: 'Inter',
+  headline: 'Manrope_700Bold',
+  headlineExtra: 'Manrope_800ExtraBold',
+  body: 'Inter_400Regular',
+  bodyMedium: 'Inter_500Medium',
+  label: 'Inter_600SemiBold',
 };
 
 export const Gradients = {

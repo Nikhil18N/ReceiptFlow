@@ -9,26 +9,27 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BorderRadius, Colors, Shadows } from '../../constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import { BorderRadius, Colors, Shadows, Fonts } from '../../constants/theme';
 
-const API_BASE_URL = 'https://necessary-goes-ours-walnut.trycloudflare.com';
+const API_BASE_URL = 'https://observer-firmware-necessary-template.trycloudflare.com';
 
-const CATEGORY_ICONS: Record<string, string> = {
-  'Food & Drink': '🍽️',
-  'Groceries': '🥗',
-  'Transport': '🚗',
-  'Shopping': '🛍️',
-  'Travel': '✈️',
-  'Entertainment': '🎬',
-  'Healthcare': '❤️‍🩹',
-  'Other': '📦',
+const CATEGORY_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
+  'Food & Drink': 'restaurant',
+  'Groceries': 'cart',
+  'Transport': 'car',
+  'Shopping': 'bag',
+  'Travel': 'airplane',
+  'Entertainment': 'film',
+  'Healthcare': 'medical',
+  'Other': 'cube',
 };
 
 const SPENDING_TIPS = [
-  { icon: '💡', text: 'Track daily spending to stay within your monthly goals' },
-  { icon: '🎯', text: 'Set category budgets to identify where you overspend' },
-  { icon: '📊', text: 'Review weekly trends to catch spending patterns early' },
-  { icon: '🏷️', text: 'Scan every receipt to build a complete financial picture' },
+  { icon: 'bulb', text: 'Track daily spending to stay within your monthly goals' },
+  { icon: 'disc', text: 'Set category budgets to identify where you overspend' },
+  { icon: 'bar-chart', text: 'Review weekly trends to catch spending patterns early' },
+  { icon: 'pricetag', text: 'Scan every receipt to build a complete financial picture' },
 ];
 
 type Stats = {
@@ -148,7 +149,7 @@ export default function InsightsScreen() {
               <View key={cat.name} style={styles.categoryRow}>
                 <View style={styles.categoryLeft}>
                   <View style={styles.categoryIconWrap}>
-                    <Text style={{ fontSize: 18 }}>{CATEGORY_ICONS[cat.name] ?? '📦'}</Text>
+                    <Ionicons name={CATEGORY_ICONS[cat.name] ?? 'cube'} size={20} color={Colors.primary} />
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.categoryName}>{cat.name}</Text>
@@ -183,7 +184,7 @@ export default function InsightsScreen() {
 
         {/* Tip Card */}
         <View style={styles.tipCard}>
-          <Text style={styles.tipIcon}>{randomTip.icon}</Text>
+          <Ionicons name={randomTip.icon as any} size={28} color={Colors['on-tertiary-fixed']} style={{ opacity: 0.8 }} />
           <View style={{ flex: 1 }}>
             <Text style={styles.tipLabel}>SMART TIP</Text>
             <Text style={styles.tipText}>{randomTip.text}</Text>
@@ -201,8 +202,8 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   scrollContent: { paddingHorizontal: 20, paddingTop: 8 },
 
-  headerTitle: { fontSize: 32, fontWeight: '800', letterSpacing: -1, color: Colors['on-surface'] },
-  headerSubtitle: { fontSize: 13, color: Colors['on-surface-variant'], marginTop: 4, fontWeight: '500', marginBottom: 20 },
+  headerTitle: { fontSize: 32, fontFamily: Fonts.headlineExtra, letterSpacing: -1, color: Colors['on-surface'] },
+  headerSubtitle: { fontSize: 13, color: Colors['on-surface-variant'], marginTop: 4, fontFamily: Fonts.bodyMedium, marginBottom: 20 },
 
   // Summary cards
   summaryRow: { flexDirection: 'row', gap: 10, marginBottom: 20 },
@@ -215,9 +216,9 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   summaryPrimary: { backgroundColor: Colors.primary },
-  summaryLabel: { fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1, color: Colors['on-surface-variant'] },
-  summaryAmount: { fontSize: 18, fontWeight: '800', color: Colors['on-surface'] },
-  summaryAmountWhite: { fontSize: 18, fontWeight: '800', color: '#fff' },
+  summaryLabel: { fontSize: 10, fontFamily: Fonts.label, textTransform: 'uppercase', letterSpacing: 1, color: Colors['on-surface-variant'] },
+  summaryAmount: { fontSize: 18, fontFamily: Fonts.headlineExtra, color: Colors['on-surface'] },
+  summaryAmountWhite: { fontSize: 18, fontFamily: Fonts.headlineExtra, color: '#fff' },
 
   // Section card
   sectionCard: {
@@ -227,7 +228,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     ...Shadows.card,
   },
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: Colors['on-surface'], marginBottom: 16 },
+  sectionTitle: { fontSize: 16, fontFamily: Fonts.headline, color: Colors['on-surface'], marginBottom: 16 },
 
   // Chart
   chartContainer: { flexDirection: 'row', gap: 6, height: 140, alignItems: 'flex-end' },
@@ -241,8 +242,8 @@ const styles = StyleSheet.create({
   },
   chartBarFill: { width: '100%', backgroundColor: Colors.primary + '60', borderRadius: 6 },
   chartBarFillActive: { backgroundColor: Colors.primary },
-  chartBarValue: { fontSize: 8, fontWeight: '700', color: Colors['on-surface-variant'] },
-  chartLabel: { fontSize: 10, fontWeight: '600', color: Colors['on-surface-variant'] },
+  chartBarValue: { fontSize: 8, fontFamily: Fonts.label, color: Colors['on-surface-variant'] },
+  chartLabel: { fontSize: 10, fontFamily: Fonts.label, color: Colors['on-surface-variant'] },
 
   // Category breakdown
   categoryRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 14, gap: 12 },
@@ -252,8 +253,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary + '15',
     alignItems: 'center', justifyContent: 'center',
   },
-  categoryName: { fontSize: 14, fontWeight: '600', color: Colors['on-surface'], marginBottom: 4 },
-  categoryAmount: { fontSize: 15, fontWeight: '700', color: Colors['on-surface'] },
+  categoryName: { fontSize: 14, fontFamily: Fonts.headline, color: Colors['on-surface'], marginBottom: 4 },
+  categoryAmount: { fontSize: 15, fontFamily: Fonts.headlineExtra, color: Colors['on-surface'] },
   progressBg: { height: 4, backgroundColor: Colors['surface-container-high'], borderRadius: 2, overflow: 'hidden' },
   progressFill: { height: '100%', backgroundColor: Colors.primary, borderRadius: 2 },
 
@@ -264,9 +265,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors['surface-container-high'],
     alignItems: 'center', justifyContent: 'center',
   },
-  merchantRankText: { fontSize: 12, fontWeight: '700', color: Colors['on-surface-variant'] },
-  merchantName: { flex: 1, fontSize: 14, fontWeight: '600', color: Colors['on-surface'] },
-  merchantAmount: { fontSize: 14, fontWeight: '700', color: Colors.primary },
+  merchantRankText: { fontSize: 12, fontFamily: Fonts.label, color: Colors['on-surface-variant'] },
+  merchantName: { flex: 1, fontSize: 14, fontFamily: Fonts.headline, color: Colors['on-surface'] },
+  merchantAmount: { fontSize: 14, fontFamily: Fonts.headlineExtra, color: Colors.primary },
 
   // Tip
   tipCard: {
@@ -277,9 +278,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     alignItems: 'center',
   },
-  tipIcon: { fontSize: 28 },
-  tipLabel: { fontSize: 9, fontWeight: '800', letterSpacing: 1.5, color: Colors['on-tertiary-fixed'], opacity: 0.6, marginBottom: 4 },
-  tipText: { fontSize: 13, fontWeight: '500', color: Colors['on-tertiary-fixed'], lineHeight: 18 },
+  tipLabel: { fontSize: 9, fontFamily: Fonts.label, letterSpacing: 1.5, color: Colors['on-tertiary-fixed'], opacity: 0.6, marginBottom: 4 },
+  tipText: { fontSize: 13, fontFamily: Fonts.bodyMedium, color: Colors['on-tertiary-fixed'], lineHeight: 18 },
 
-  emptyText: { fontSize: 14, color: Colors['on-surface-variant'], fontStyle: 'italic', textAlign: 'center', paddingVertical: 20 },
+  emptyText: { fontSize: 14, color: Colors['on-surface-variant'], fontFamily: Fonts.body, fontStyle: 'italic', textAlign: 'center', paddingVertical: 20 },
 });

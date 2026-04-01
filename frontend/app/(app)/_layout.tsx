@@ -1,7 +1,8 @@
 import { useAuth } from '@clerk/clerk-expo';
-import { Redirect, Tabs, useRouter } from 'expo-router';
+import { Redirect, Tabs, useRouter, useSegments } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { BorderRadius, Colors, Shadows } from '../../constants/theme';
 
 /**
@@ -12,6 +13,8 @@ import { BorderRadius, Colors, Shadows } from '../../constants/theme';
 export default function AppLayout() {
   const { isSignedIn, isLoaded } = useAuth();
   const router = useRouter();
+  const segments = useSegments();
+  const isScannerScreen = (segments as string[]).includes('scanner');
 
   if (!isLoaded) return null;
 
@@ -36,7 +39,7 @@ export default function AppLayout() {
           options={{
             title: 'Home',
             tabBarIcon: ({ focused }) => (
-              <TabIcon icon="🏠" focused={focused} />
+              <TabIcon name="home" focused={focused} />
             ),
           }}
         />
@@ -45,7 +48,7 @@ export default function AppLayout() {
           options={{
             title: 'Activity',
             tabBarIcon: ({ focused }) => (
-              <TabIcon icon="📊" focused={focused} />
+              <TabIcon name="receipt" focused={focused} />
             ),
           }}
         />
@@ -70,7 +73,7 @@ export default function AppLayout() {
           options={{
             title: 'Insights',
             tabBarIcon: ({ focused }) => (
-              <TabIcon icon="💡" focused={focused} />
+              <TabIcon name="stats-chart" focused={focused} />
             ),
           }}
         />
@@ -79,7 +82,7 @@ export default function AppLayout() {
           options={{
             title: 'Profile',
             tabBarIcon: ({ focused }) => (
-              <TabIcon icon="👤" focused={focused} />
+              <TabIcon name="person" focused={focused} />
             ),
           }}
         />
@@ -93,23 +96,25 @@ export default function AppLayout() {
       </Tabs>
 
       {/* Center Scanner FAB */}
-      <TouchableOpacity
-        style={styles.centerFab}
-        onPress={() => router.push('/(app)/scanner')}
-        activeOpacity={0.85}
-      >
-        <View style={styles.centerFabInner}>
-          <Text style={styles.centerFabIcon}>📷</Text>
-        </View>
-      </TouchableOpacity>
+      {!isScannerScreen && (
+        <TouchableOpacity
+          style={styles.centerFab}
+          onPress={() => router.push('/(app)/scanner')}
+          activeOpacity={0.85}
+        >
+          <View style={styles.centerFabInner}>
+            <Ionicons name="camera" size={26} color="#fff" />
+          </View>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
 
-function TabIcon({ icon, focused }: { icon: string; focused: boolean }) {
+function TabIcon({ name, focused }: { name: keyof typeof Ionicons.glyphMap; focused: boolean }) {
   return (
     <View style={[styles.tabIconWrap, focused && styles.tabIconWrapActive]}>
-      <Text style={styles.tabIconText}>{icon}</Text>
+      <Ionicons name={name} size={18} color={focused ? Colors.primary : Colors['on-surface-variant']} />
     </View>
   );
 }

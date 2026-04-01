@@ -11,19 +11,20 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BorderRadius, Colors, Shadows } from '../../constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import { BorderRadius, Colors, Shadows, Fonts } from '../../constants/theme';
 
-const API_BASE_URL = 'https://necessary-goes-ours-walnut.trycloudflare.com';
+const API_BASE_URL = 'https://observer-firmware-necessary-template.trycloudflare.com';
 
-const CATEGORY_ICONS: Record<string, string> = {
-  'Food & Drink': '🍽️',
-  'Groceries': '🥗',
-  'Transport': '🚗',
-  'Shopping': '🛍️',
-  'Travel': '✈️',
-  'Entertainment': '🎬',
-  'Healthcare': '❤️‍🩹',
-  'Other': '📦',
+const CATEGORY_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
+  'Food & Drink': 'restaurant',
+  'Groceries': 'cart',
+  'Transport': 'car',
+  'Shopping': 'bag',
+  'Travel': 'airplane',
+  'Entertainment': 'film',
+  'Healthcare': 'medical',
+  'Other': 'cube',
 };
 
 type Stats = {
@@ -156,7 +157,7 @@ export default function DashboardScreen() {
                   <View key={cat.name} style={{ gap: 6, marginTop: 8 }}>
                     <View style={styles.catRow}>
                       <View style={styles.catIconWrap}>
-                        <Text>{CATEGORY_ICONS[cat.name] ?? '📦'}</Text>
+                        <Ionicons name={CATEGORY_ICONS[cat.name] ?? 'cube'} size={16} color={Colors.primary} />
                       </View>
                       <Text style={styles.catName}>{cat.name}</Text>
                       <Text style={styles.catAmount}>${cat.amount.toFixed(0)}</Text>
@@ -194,7 +195,7 @@ export default function DashboardScreen() {
 
             {(stats?.recentExpenses ?? []).length === 0 ? (
               <View style={styles.emptyCard}>
-                <Text style={styles.emptyIcon}>📭</Text>
+                <Ionicons name="receipt-outline" size={48} color={Colors['on-surface-variant']} style={{ marginBottom: 12 }} />
                 <Text style={styles.emptyTitle}>No expenses yet</Text>
                 <Text style={styles.emptySubtitle}>
                   Tap the camera button below to scan your first receipt
@@ -205,7 +206,7 @@ export default function DashboardScreen() {
                 <View key={item.id} style={styles.expenseCard}>
                   <View style={styles.expenseLeft}>
                     <View style={styles.expenseIcon}>
-                      <Text style={{ fontSize: 22 }}>{CATEGORY_ICONS[item.category] ?? '📦'}</Text>
+                      <Ionicons name={CATEGORY_ICONS[item.category] ?? 'cube'} size={24} color={Colors.primary} />
                     </View>
                     <View>
                       <Text style={styles.expenseMerchant}>{item.merchantName}</Text>
@@ -251,10 +252,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     alignItems: 'center', justifyContent: 'center',
   },
-  avatarText: { fontSize: 16, fontWeight: '700', color: '#fff' },
-  headerGreeting: { fontSize: 11, color: Colors['on-surface-variant'] },
-  headerName: { fontSize: 16, fontWeight: '700', color: Colors['on-surface'] },
-  brandName: { fontSize: 18, fontWeight: '800', color: Colors.primary, letterSpacing: -0.5 },
+  avatarText: { fontSize: 16, fontFamily: Fonts.headline, color: '#fff' },
+  headerGreeting: { fontSize: 11, fontFamily: Fonts.body, color: Colors['on-surface-variant'] },
+  headerName: { fontSize: 16, fontFamily: Fonts.headline, color: Colors['on-surface'] },
+  brandName: { fontSize: 18, fontFamily: Fonts.headlineExtra, color: Colors.primary, letterSpacing: -0.5 },
 
   // Hero card
   heroCard: {
@@ -281,11 +282,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10, paddingVertical: 4,
     borderRadius: BorderRadius.pill,
   },
-  heroBadgeText: { fontSize: 10, fontWeight: '700', color: '#fff', letterSpacing: 1.2, textTransform: 'uppercase' },
-  heroLabel: { fontSize: 15, color: 'rgba(255,255,255,0.8)', fontWeight: '500', marginBottom: 4 },
+  heroBadgeText: { fontSize: 10, fontFamily: Fonts.label, color: '#fff', letterSpacing: 1.2, textTransform: 'uppercase' },
+  heroLabel: { fontSize: 15, color: 'rgba(255,255,255,0.8)', fontFamily: Fonts.bodyMedium, marginBottom: 4 },
   heroAmountRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 4 },
-  heroAmount: { fontSize: 52, fontWeight: '800', color: '#fff', letterSpacing: -2 },
-  heroAmountCents: { fontSize: 24, fontWeight: '700', color: 'rgba(255,255,255,0.65)', marginBottom: 6 },
+  heroAmount: { fontSize: 52, fontFamily: Fonts.headlineExtra, color: '#fff', letterSpacing: -2 },
+  heroAmountCents: { fontSize: 24, fontFamily: Fonts.headline, color: 'rgba(255,255,255,0.65)', marginBottom: 6 },
   miniChart: { flexDirection: 'row', alignItems: 'flex-end', gap: 5, height: 60, marginTop: 20 },
   bar: { flex: 1, backgroundColor: 'rgba(255,255,255,0.2)', borderTopLeftRadius: 4, borderTopRightRadius: 4 },
   barActive: { backgroundColor: 'rgba(255,255,255,0.5)' },
@@ -319,8 +320,8 @@ const styles = StyleSheet.create({
 
   // Section header
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
-  sectionTitle: { fontSize: 22, fontWeight: '800', letterSpacing: -0.5, color: Colors['on-surface'] },
-  viewAll: { fontSize: 13, fontWeight: '700', color: Colors.primary },
+  sectionTitle: { fontSize: 22, fontFamily: Fonts.headlineExtra, letterSpacing: -0.5, color: Colors['on-surface'] },
+  viewAll: { fontSize: 13, fontFamily: Fonts.label, color: Colors.primary },
 
   // Expense cards
   expenseCard: {
@@ -335,10 +336,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors['surface-container-high'],
     alignItems: 'center', justifyContent: 'center',
   },
-  expenseMerchant: { fontSize: 15, fontWeight: '700', color: Colors['on-surface'] },
-  expenseDate: { fontSize: 12, color: Colors['on-surface-variant'], marginTop: 2 },
+  expenseMerchant: { fontSize: 15, fontFamily: Fonts.label, color: Colors['on-surface'] },
+  expenseDate: { fontSize: 12, fontFamily: Fonts.body, color: Colors['on-surface-variant'], marginTop: 2 },
   expenseRight: { alignItems: 'flex-end' },
-  expenseAmount: { fontSize: 17, fontWeight: '800', color: Colors['on-surface'] },
+  expenseAmount: { fontSize: 17, fontFamily: Fonts.headlineExtra, color: Colors['on-surface'] },
   categoryBadge: {
     marginTop: 4,
     backgroundColor: Colors.primary + '15',

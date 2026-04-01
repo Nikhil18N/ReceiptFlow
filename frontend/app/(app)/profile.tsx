@@ -13,7 +13,8 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BorderRadius, Colors, Shadows } from '../../constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import { BorderRadius, Colors, Shadows, Fonts } from '../../constants/theme';
 
 export default function ProfileScreen() {
   const { signOut } = useAuth();
@@ -71,7 +72,7 @@ export default function ProfileScreen() {
               <Text style={styles.profileEmail}>{email}</Text>
               <View style={styles.memberBadge}>
                 <Text style={styles.memberBadgeText}>
-                  📅 Member since {joinedDate}
+                  Member since {joinedDate}
                 </Text>
               </View>
             </View>
@@ -85,7 +86,7 @@ export default function ProfileScreen() {
           <View style={styles.settingRow}>
             <View style={styles.settingLeft}>
               <View style={styles.settingIconWrap}>
-                <Text style={{ fontSize: 18 }}>💰</Text>
+                <Ionicons name="cash" size={20} color={Colors.primary} />
               </View>
               <View>
                 <Text style={styles.settingTitle}>Currency</Text>
@@ -106,7 +107,7 @@ export default function ProfileScreen() {
           <View style={styles.settingRow}>
             <View style={styles.settingLeft}>
               <View style={styles.settingIconWrap}>
-                <Text style={{ fontSize: 18 }}>🔔</Text>
+                <Ionicons name="notifications" size={20} color={Colors.primary} />
               </View>
               <View>
                 <Text style={styles.settingTitle}>Notifications</Text>
@@ -128,7 +129,7 @@ export default function ProfileScreen() {
           <View style={styles.settingRow}>
             <View style={styles.settingLeft}>
               <View style={styles.settingIconWrap}>
-                <Text style={{ fontSize: 18 }}>🧾</Text>
+                <Ionicons name="receipt" size={20} color={Colors.primary} />
               </View>
               <View>
                 <Text style={styles.settingTitle}>Receipt Flow</Text>
@@ -142,7 +143,7 @@ export default function ProfileScreen() {
           <View style={styles.settingRow}>
             <View style={styles.settingLeft}>
               <View style={styles.settingIconWrap}>
-                <Text style={{ fontSize: 18 }}>🤖</Text>
+                <Ionicons name="hardware-chip" size={20} color={Colors.primary} />
               </View>
               <View>
                 <Text style={styles.settingTitle}>Powered by AI</Text>
@@ -161,7 +162,7 @@ export default function ProfileScreen() {
           >
             <View style={styles.settingLeft}>
               <View style={styles.settingIconWrap}>
-                <Text style={{ fontSize: 18 }}>📤</Text>
+                <Ionicons name="cloud-download" size={20} color={Colors.primary} />
               </View>
               <View>
                 <Text style={styles.settingTitle}>Export Data</Text>
@@ -174,7 +175,7 @@ export default function ProfileScreen() {
 
         {/* Sign Out */}
         <TouchableOpacity style={styles.signOutBtn} onPress={handleSignOut} activeOpacity={0.85}>
-          <Text style={styles.signOutIcon}>⏻</Text>
+          <Ionicons name="log-out" size={20} color={Colors.error} />
           <Text style={styles.signOutText}>Sign Out</Text>
         </TouchableOpacity>
 
@@ -192,7 +193,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   scrollContent: { paddingHorizontal: 20, paddingTop: 8 },
 
-  headerTitle: { fontSize: 32, fontWeight: '800', letterSpacing: -1, color: Colors['on-surface'], marginBottom: 20 },
+  headerTitle: { fontSize: 32, fontFamily: Fonts.headlineExtra, letterSpacing: -1, color: Colors['on-surface'], marginBottom: 20 },
 
   // Profile card
   profileCard: {
@@ -209,10 +210,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     alignItems: 'center', justifyContent: 'center',
   },
-  avatarInitial: { fontSize: 28, fontWeight: '800', color: '#fff' },
+  avatarInitial: { fontSize: 28, fontFamily: Fonts.headlineExtra, color: '#fff' },
   profileInfo: { flex: 1, gap: 4 },
-  profileName: { fontSize: 22, fontWeight: '800', color: Colors['on-surface'] },
-  profileEmail: { fontSize: 13, color: Colors['on-surface-variant'] },
+  profileName: { fontSize: 22, fontFamily: Fonts.headlineExtra, color: Colors['on-surface'] },
+  profileEmail: { fontSize: 13, fontFamily: Fonts.body, color: Colors['on-surface-variant'] },
   memberBadge: {
     marginTop: 6,
     alignSelf: 'flex-start',
@@ -220,11 +221,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10, paddingVertical: 4,
     borderRadius: BorderRadius.pill,
   },
-  memberBadgeText: { fontSize: 11, fontWeight: '600', color: Colors.primary },
+  memberBadgeText: { fontSize: 11, fontFamily: Fonts.label, color: Colors.primary },
 
   // Section labels
   sectionLabel: {
-    fontSize: 11, fontWeight: '700', letterSpacing: 1.5, textTransform: 'uppercase',
+    fontSize: 11, fontFamily: Fonts.label, letterSpacing: 1.5, textTransform: 'uppercase',
     color: Colors['on-surface-variant'], marginBottom: 10, paddingLeft: 4,
   },
 
@@ -246,17 +247,17 @@ const styles = StyleSheet.create({
     backgroundColor: Colors['surface-container-high'],
     alignItems: 'center', justifyContent: 'center',
   },
-  settingTitle: { fontSize: 15, fontWeight: '600', color: Colors['on-surface'] },
-  settingSubtitle: { fontSize: 12, color: Colors['on-surface-variant'], marginTop: 2 },
+  settingTitle: { fontSize: 15, fontFamily: Fonts.headline, color: Colors['on-surface'] },
+  settingSubtitle: { fontSize: 12, fontFamily: Fonts.body, color: Colors['on-surface-variant'], marginTop: 2 },
   divider: { height: 1, backgroundColor: Colors['outline-variant'] + '20', marginHorizontal: 16 },
-  chevron: { fontSize: 12, color: Colors['on-surface-variant'] },
+  chevron: { fontSize: 12, fontFamily: Fonts.label, color: Colors['on-surface-variant'] },
 
   currencyToggle: {
     backgroundColor: Colors.primary + '15',
     paddingHorizontal: 14, paddingVertical: 6,
     borderRadius: BorderRadius.pill,
   },
-  currencyText: { fontSize: 13, fontWeight: '700', color: Colors.primary },
+  currencyText: { fontSize: 13, fontFamily: Fonts.headline, color: Colors.primary },
 
   // Sign out
   signOutBtn: {
@@ -266,11 +267,10 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 16,
   },
-  signOutIcon: { fontSize: 18, color: Colors.error },
-  signOutText: { fontSize: 16, fontWeight: '700', color: Colors.error },
+  signOutText: { fontSize: 16, fontFamily: Fonts.headlineExtra, color: Colors.error },
 
   footerText: {
-    textAlign: 'center', fontSize: 12, color: Colors['on-surface-variant'],
-    marginBottom: 16, fontWeight: '500',
+    textAlign: 'center', fontSize: 12, fontFamily: Fonts.bodyMedium, color: Colors['on-surface-variant'],
+    marginBottom: 16,
   },
 });

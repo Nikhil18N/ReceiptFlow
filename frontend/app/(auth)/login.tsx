@@ -16,7 +16,8 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BorderRadius, Colors, Shadows } from '../../constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import { BorderRadius, Colors, Shadows, Fonts } from '../../constants/theme';
 
 const { width } = Dimensions.get('window');
 
@@ -233,7 +234,7 @@ export default function LoginScreen() {
           {/* ── Logo ─────────────────────────────────────────────────── */}
           <View style={styles.logoContainer}>
             <View style={styles.logoIconBg}>
-              <Text style={styles.logoIcon}>🧾</Text>
+              <Ionicons name="receipt" size={30} color={Colors['on-primary']} />
             </View>
             <Text style={styles.appName}>Receipt Flow</Text>
           </View>
@@ -368,10 +369,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     ...Shadows.fab,
   },
-  logoIcon: { fontSize: 28 },
   appName: {
     fontSize: 24,
-    fontWeight: '800',
+    fontFamily: Fonts.headlineExtra,
     letterSpacing: -0.5,
     color: Colors['on-surface'],
   },
@@ -388,12 +388,13 @@ const styles = StyleSheet.create({
   cardHeader: { gap: 6 },
   welcomeTitle: {
     fontSize: 28,
-    fontWeight: '700',
+    fontFamily: Fonts.headlineExtra,
     letterSpacing: -0.5,
     color: Colors['on-surface'],
   },
   welcomeSubtitle: {
     fontSize: 14,
+    fontFamily: Fonts.body,
     color: Colors['on-surface-variant'],
     lineHeight: 20,
   },
@@ -407,7 +408,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 11,
-    fontWeight: '600',
+    fontFamily: Fonts.label,
     letterSpacing: 1.2,
     color: Colors['on-surface-variant'],
   },
@@ -422,6 +423,7 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.xl,
     backgroundColor: Colors['surface-container-highest'],
     fontSize: 15,
+    fontFamily: Fonts.bodyMedium,
     color: Colors['on-surface'],
   },
 
@@ -437,7 +439,7 @@ const styles = StyleSheet.create({
   primaryBtnText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: Fonts.headline,
     letterSpacing: 0.2,
   },
   disabled: { opacity: 0.6 },

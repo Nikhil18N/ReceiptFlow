@@ -12,9 +12,10 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors } from '../../constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import { Colors, Fonts } from '../../constants/theme';
 
-const API_BASE_URL = 'https://necessary-goes-ours-walnut.trycloudflare.com';
+const API_BASE_URL = 'https://observer-firmware-necessary-template.trycloudflare.com';
 
 export default function ScannerScreen() {
   const router = useRouter();
@@ -77,6 +78,7 @@ export default function ScannerScreen() {
           totalAmount: String(json.data.totalAmount),
           date: json.data.date,
           category: json.data.category,
+          imageUri: uri,
         },
       });
     } catch (err: any) {
@@ -141,14 +143,14 @@ export default function ScannerScreen() {
             style={styles.iconBtn}
             onPress={() => router.back()}
           >
-            <Text style={styles.iconBtnText}>✕</Text>
+            <Ionicons name="close" size={24} color="#fff" />
           </TouchableOpacity>
           <View style={styles.topBarRight}>
             <TouchableOpacity
               style={[styles.iconBtn, flashMode === 'on' && styles.iconBtnActive]}
               onPress={() => setFlashMode(f => f === 'off' ? 'on' : 'off')}
             >
-              <Text style={styles.iconBtnText}>{flashMode === 'on' ? '⚡' : '🔦'}</Text>
+              <Ionicons name={flashMode === 'on' ? 'flash' : 'flash-outline'} size={24} color="#fff" />
             </TouchableOpacity>
           </View>
         </View>
@@ -182,7 +184,8 @@ export default function ScannerScreen() {
           </View>
 
           <View style={styles.hintBadge}>
-            <Text style={styles.hintBadgeText}>✨  Powered by Gemini AI</Text>
+            <Ionicons name="sparkles" size={14} color={Colors['primary-fixed']} style={{ marginRight: 6 }} />
+            <Text style={styles.hintBadgeText}>Powered by Gemini AI</Text>
           </View>
         </View>
 
@@ -195,7 +198,7 @@ export default function ScannerScreen() {
             disabled={scanning}
             activeOpacity={0.7}
           >
-            <Text style={styles.galleryIcon}>🖼️</Text>
+            <Ionicons name="images" size={20} color="rgba(255,255,255,0.8)" style={{ marginBottom: 2 }} />
             <Text style={styles.galleryLabel}>Gallery</Text>
           </TouchableOpacity>
 
@@ -211,8 +214,9 @@ export default function ScannerScreen() {
 
           {/* Flash label */}
           <View style={styles.modeBtn}>
+            <Ionicons name="flash" size={12} color="rgba(255,255,255,0.8)" style={{ marginBottom: 2 }} />
             <Text style={styles.modeIcon}>
-              {flashMode === 'on' ? '⚡ On' : '⚡ Off'}
+              {flashMode === 'on' ? 'On' : 'Off'}
             </Text>
           </View>
         </View>
@@ -230,12 +234,12 @@ const styles = StyleSheet.create({
   overlay: { flex: 1 },
   vignette: { ...StyleSheet.absoluteFillObject },
 
-  permissionText: { fontSize: 16, color: Colors['on-surface'], textAlign: 'center', marginBottom: 20 },
+  permissionText: { fontSize: 16, fontFamily: Fonts.body, color: Colors['on-surface'], textAlign: 'center', marginBottom: 20 },
   permissionBtn: {
     paddingHorizontal: 24, paddingVertical: 14,
     backgroundColor: Colors.primary, borderRadius: 16,
   },
-  permissionBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  permissionBtnText: { color: '#fff', fontSize: 15, fontFamily: Fonts.headlineExtra },
 
   topBar: {
     flexDirection: 'row',
@@ -254,7 +258,7 @@ const styles = StyleSheet.create({
   iconBtnActive: {
     backgroundColor: Colors.primary + 'CC',
   },
-  iconBtnText: { fontSize: 18, color: '#fff' },
+  iconBtnText: { fontSize: 18, fontFamily: Fonts.headline, color: '#fff' },
 
   viewfinderArea: {
     flex: 1,
@@ -294,17 +298,18 @@ const styles = StyleSheet.create({
   cornerBR: { bottom: -2, right: -2, borderBottomWidth: CORNER_THICKNESS, borderRightWidth: CORNER_THICKNESS, borderBottomRightRadius: 8 },
 
   hintInner: { alignItems: 'center', paddingHorizontal: 20 },
-  hintTitle: { fontSize: 17, fontWeight: '700', color: '#fff', textTransform: 'uppercase', letterSpacing: 0.5 },
-  hintSubtitle: { fontSize: 13, color: 'rgba(255,255,255,0.6)', marginTop: 6, textAlign: 'center' },
+  hintTitle: { fontSize: 17, fontFamily: Fonts.headlineExtra, color: '#fff', textTransform: 'uppercase', letterSpacing: 0.5 },
+  hintSubtitle: { fontSize: 13, fontFamily: Fonts.bodyMedium, color: 'rgba(255,255,255,0.6)', marginTop: 6, textAlign: 'center' },
 
   hintBadge: {
+    flexDirection: 'row', alignItems: 'center',
     marginTop: 24,
     paddingHorizontal: 18, paddingVertical: 10,
     backgroundColor: 'rgba(0,45,22,0.5)',
     borderRadius: 99,
     borderWidth: 1, borderColor: Colors['primary-fixed-dim'] + '50',
   },
-  hintBadgeText: { fontSize: 11, fontWeight: '700', color: Colors['primary-fixed'], letterSpacing: 1.2, textTransform: 'uppercase' },
+  hintBadgeText: { fontSize: 11, fontFamily: Fonts.label, color: Colors['primary-fixed'], letterSpacing: 1.2, textTransform: 'uppercase' },
 
   bottomBar: {
     flexDirection: 'row',
@@ -322,7 +327,7 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   galleryIcon: { fontSize: 20 },
-  galleryLabel: { fontSize: 8, fontWeight: '700', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' },
+  galleryLabel: { fontSize: 8, fontFamily: Fonts.label, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' },
   shutter: {
     width: 80, height: 80,
     borderRadius: 40,
@@ -341,5 +346,5 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.12)',
     alignItems: 'center', justifyContent: 'center',
   },
-  modeIcon: { fontSize: 12, color: 'rgba(255,255,255,0.8)', fontWeight: '700' },
+  modeIcon: { fontSize: 10, color: 'rgba(255,255,255,0.8)', fontFamily: Fonts.label },
 });

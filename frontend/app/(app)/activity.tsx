@@ -12,22 +12,23 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BorderRadius, Colors, Shadows } from '../../constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import { BorderRadius, Colors, Shadows, Fonts } from '../../constants/theme';
 
-const API_BASE_URL = 'https://necessary-goes-ours-walnut.trycloudflare.com';
+const API_BASE_URL = 'https://observer-firmware-necessary-template.trycloudflare.com';
 
 const CATEGORIES = ['All', 'Food & Drink', 'Groceries', 'Transport', 'Shopping', 'Travel', 'Entertainment', 'Healthcare', 'Other'];
 
-const CATEGORY_ICONS: Record<string, string> = {
-  'All': '📋',
-  'Food & Drink': '🍽️',
-  'Groceries': '🥗',
-  'Transport': '🚗',
-  'Shopping': '🛍️',
-  'Travel': '✈️',
-  'Entertainment': '🎬',
-  'Healthcare': '❤️‍🩹',
-  'Other': '📦',
+const CATEGORY_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
+  'All': 'list',
+  'Food & Drink': 'restaurant',
+  'Groceries': 'cart',
+  'Transport': 'car',
+  'Shopping': 'bag',
+  'Travel': 'airplane',
+  'Entertainment': 'film',
+  'Healthcare': 'medical',
+  'Other': 'cube',
 };
 
 type Expense = {
@@ -87,7 +88,7 @@ export default function ActivityScreen() {
     <View style={styles.expenseCard}>
       <View style={styles.expenseLeft}>
         <View style={styles.expenseIcon}>
-          <Text style={{ fontSize: 22 }}>{CATEGORY_ICONS[item.category] ?? '📦'}</Text>
+          <Ionicons name={CATEGORY_ICONS[item.category] ?? 'cube'} size={24} color={Colors.primary} />
         </View>
         <View style={{ flex: 1 }}>
           <Text style={styles.expenseMerchant} numberOfLines={1}>{item.merchantName}</Text>
@@ -113,7 +114,7 @@ export default function ActivityScreen() {
 
       {/* Search */}
       <View style={styles.searchBar}>
-        <Text style={styles.searchIcon}>🔍</Text>
+        <Ionicons name="search" size={18} color={Colors.outline} style={{ marginRight: 8 }} />
         <TextInput
           style={styles.searchInput}
           placeholder="Search merchants..."
@@ -137,7 +138,7 @@ export default function ActivityScreen() {
             onPress={() => setSelectedCategory(cat)}
           >
             <Text style={[styles.filterChipText, selectedCategory === cat && styles.filterChipTextActive]}>
-              {CATEGORY_ICONS[cat]} {cat}
+              <Ionicons name={CATEGORY_ICONS[cat] ?? 'cube'} size={14} color={selectedCategory === cat ? '#fff' : Colors['on-surface-variant']} /> {cat}
             </Text>
           </TouchableOpacity>
         )}
@@ -151,7 +152,7 @@ export default function ActivityScreen() {
         </View>
       ) : expenses.length === 0 ? (
         <View style={styles.center}>
-          <Text style={styles.emptyIcon}>📭</Text>
+          <Ionicons name="receipt-outline" size={64} color={Colors['on-surface-variant']} style={{ marginBottom: 16 }} />
           <Text style={styles.emptyTitle}>No Expenses Yet</Text>
           <Text style={styles.emptySubtitle}>
             Scan your first receipt to start tracking your spending
@@ -178,8 +179,8 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
 
   header: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 16 },
-  headerTitle: { fontSize: 32, fontWeight: '800', letterSpacing: -1, color: Colors['on-surface'] },
-  headerSubtitle: { fontSize: 13, color: Colors['on-surface-variant'], marginTop: 4, fontWeight: '500' },
+  headerTitle: { fontSize: 32, fontFamily: Fonts.headlineExtra, letterSpacing: -1, color: Colors['on-surface'] },
+  headerSubtitle: { fontSize: 13, color: Colors['on-surface-variant'], marginTop: 4, fontFamily: Fonts.bodyMedium },
 
   searchBar: {
     flexDirection: 'row',
@@ -192,7 +193,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   searchIcon: { fontSize: 16, marginRight: 8 },
-  searchInput: { flex: 1, fontSize: 15, color: Colors['on-surface'] },
+  searchInput: { flex: 1, fontSize: 15, fontFamily: Fonts.body, color: Colors['on-surface'] },
 
   filterRow: { paddingHorizontal: 16, gap: 8, marginBottom: 12, height: 40 },
   filterChip: {
@@ -207,7 +208,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     borderColor: Colors.primary,
   },
-  filterChipText: { fontSize: 12, fontWeight: '600', color: Colors['on-surface-variant'] },
+  filterChipText: { fontSize: 12, fontFamily: Fonts.label, color: Colors['on-surface-variant'] },
   filterChipTextActive: { color: '#fff' },
 
   listContent: { paddingHorizontal: 20, paddingBottom: 100 },
@@ -229,19 +230,18 @@ const styles = StyleSheet.create({
     backgroundColor: Colors['surface-container-high'],
     alignItems: 'center', justifyContent: 'center',
   },
-  expenseMerchant: { fontSize: 15, fontWeight: '700', color: Colors['on-surface'] },
-  expenseDate: { fontSize: 12, color: Colors['on-surface-variant'], marginTop: 2 },
+  expenseMerchant: { fontSize: 15, fontFamily: Fonts.label, color: Colors['on-surface'] },
+  expenseDate: { fontSize: 12, fontFamily: Fonts.body, color: Colors['on-surface-variant'], marginTop: 2 },
   expenseRight: { alignItems: 'flex-end' },
-  expenseAmount: { fontSize: 17, fontWeight: '800', color: Colors['on-surface'] },
+  expenseAmount: { fontSize: 17, fontFamily: Fonts.headlineExtra, color: Colors['on-surface'] },
   categoryBadge: {
     marginTop: 4,
     backgroundColor: Colors.primary + '15',
     paddingHorizontal: 8, paddingVertical: 2,
     borderRadius: BorderRadius.sm,
   },
-  categoryBadgeText: { fontSize: 10, fontWeight: '700', color: Colors.primary, letterSpacing: 0.8, textTransform: 'uppercase' },
+  categoryBadgeText: { fontSize: 10, fontFamily: Fonts.label, color: Colors.primary, letterSpacing: 0.8, textTransform: 'uppercase' },
 
-  emptyIcon: { fontSize: 64, marginBottom: 16 },
-  emptyTitle: { fontSize: 20, fontWeight: '700', color: Colors['on-surface'], marginBottom: 8 },
-  emptySubtitle: { fontSize: 14, color: Colors['on-surface-variant'], textAlign: 'center', lineHeight: 20 },
+  emptyTitle: { fontSize: 20, fontFamily: Fonts.headline, color: Colors['on-surface'], marginBottom: 8 },
+  emptySubtitle: { fontSize: 14, fontFamily: Fonts.body, color: Colors['on-surface-variant'], textAlign: 'center', lineHeight: 20 },
 });

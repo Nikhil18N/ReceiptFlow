@@ -1,7 +1,8 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -12,22 +13,23 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { BorderRadius, Colors, Shadows } from '../../constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import { BorderRadius, Colors, Shadows, Fonts } from '../../constants/theme';
 
 const CATEGORIES = [
   'Food & Drink', 'Groceries', 'Transport', 'Shopping',
   'Travel', 'Entertainment', 'Healthcare', 'Other',
 ] as const;
 
-const CATEGORY_ICONS: Record<string, string> = {
-  'Food & Drink': '🍽️',
-  'Groceries': '🥗',
-  'Transport': '🚗',
-  'Shopping': '🛍️',
-  'Travel': '✈️',
-  'Entertainment': '🎬',
-  'Healthcare': '❤️‍🩹',
-  'Other': '📋',
+const CATEGORY_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
+  'Food & Drink': 'restaurant',
+  'Groceries': 'cart',
+  'Transport': 'car',
+  'Shopping': 'bag',
+  'Travel': 'airplane',
+  'Entertainment': 'film',
+  'Healthcare': 'medical',
+  'Other': 'cube',
 };
 
 export default function ResultsScreen() {
@@ -39,6 +41,7 @@ export default function ResultsScreen() {
     totalAmount: string;
     date: string;
     category: string;
+    imageUri?: string;
   }>();
 
   const [merchantName, setMerchantName] = useState(params.merchantName ?? '');
@@ -46,6 +49,14 @@ export default function ResultsScreen() {
   const [date, setDate] = useState(params.date ?? '');
   const [category, setCategory] = useState(params.category ?? 'Other');
   const [showCategories, setShowCategories] = useState(false);
+
+  // --- Sync state with navigation params if they arrive after mount ---
+  useEffect(() => {
+    if (params.merchantName) setMerchantName(params.merchantName);
+    if (params.totalAmount) setTotalAmount(params.totalAmount);
+    if (params.date) setDate(params.date);
+    if (params.category) setCategory(params.category);
+  }, [params.merchantName, params.totalAmount, params.date, params.category]);
 
   const handleLogExpense = () => {
     // Expense is already saved in the database by the backend.
@@ -67,11 +78,11 @@ export default function ResultsScreen() {
       {/* ── Header ───────────────────────────────────────────────── */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Text style={styles.backIcon}>←</Text>
+          <Ionicons name="arrow-back" size={20} color={Colors.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Verify Expense</Text>
         <View style={styles.headerAvatar}>
-          <Text style={{ fontSize: 14 }}>👤</Text>
+          <Ionicons name="person-circle" size={24} color={Colors.outline} />
         </View>
       </View>
 
@@ -87,12 +98,18 @@ export default function ResultsScreen() {
           {/* ── Receipt preview placeholder ───────────────────────── */}
           <View style={styles.receiptPreviewCard}>
             <View style={styles.receiptImagePlaceholder}>
-              <Text style={styles.receiptPlaceholderIcon}>🧾</Text>
-              <Text style={styles.receiptPlaceholderText}>Scanned Receipt</Text>
+              {params.imageUri ? (
+                <Image source={{ uri: params.imageUri }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+              ) : (
+                <>
+                  <Ionicons name="receipt-outline" size={48} color={Colors['on-surface-variant']} />
+                  <Text style={styles.receiptPlaceholderText}>Scanned Receipt</Text>
+                </>
+              )}
             </View>
             {/* AI verified badge */}
             <View style={styles.aiBadge}>
-              <Text style={styles.aiBadgeIcon}>✅</Text>
+              <Ionicons name="checkmark-circle" size={14} color={Colors.primary} />
               <Text style={styles.aiBadgeText}>AI Extracted</Text>
             </View>
           </View>
@@ -121,7 +138,7 @@ export default function ResultsScreen() {
           <View style={styles.fieldGroup}>
             <Text style={styles.fieldLabel}>MERCHANT NAME</Text>
             <View style={styles.fieldRow}>
-              <Text style={styles.fieldIcon}>🏪</Text>
+              <Ionicons name="storefront" size={18} color={Colors['on-surface-variant']} style={{ marginRight: 6 }} />
               <TextInput
                 style={styles.fieldInput}
                 value={merchantName}
@@ -137,7 +154,7 @@ export default function ResultsScreen() {
             <View style={[styles.fieldGroup, { flex: 1 }]}>
               <Text style={styles.fieldLabel}>TOTAL AMOUNT</Text>
               <View style={[styles.fieldRow, styles.fieldRowPrimary]}>
-                <Text style={styles.fieldIcon}>💳</Text>
+                <Ionicons name="card" size={18} color={Colors.primary} style={{ marginRight: 6 }} />
                 <TextInput
                   style={[styles.fieldInput, styles.fieldInputLarge, { color: Colors.primary }]}
                   value={totalAmount}
@@ -151,7 +168,7 @@ export default function ResultsScreen() {
             <View style={[styles.fieldGroup, { flex: 1 }]}>
               <Text style={styles.fieldLabel}>DATE</Text>
               <View style={styles.fieldRow}>
-                <Text style={styles.fieldIcon}>📅</Text>
+                <Ionicons name="calendar-outline" size={18} color={Colors['on-surface-variant']} style={{ marginRight: 6 }} />
                 <TextInput
                   style={styles.fieldInput}
                   value={date}
@@ -172,13 +189,13 @@ export default function ResultsScreen() {
               activeOpacity={0.8}
             >
               <View style={styles.categoryIconWrap}>
-                <Text style={{ fontSize: 22 }}>{CATEGORY_ICONS[category] ?? '📋'}</Text>
+                <Ionicons name={CATEGORY_ICONS[category] ?? 'cube'} size={24} color={Colors.tertiary} />
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.categoryName}>{category}</Text>
                 <Text style={styles.categoryMeta}>Auto-detected from merchant name</Text>
               </View>
-              <Text style={styles.categoryChevron}>{showCategories ? '▲' : '▶'}</Text>
+              <Ionicons name={showCategories ? "chevron-up" : "chevron-forward"} size={16} color={Colors['on-surface-variant']} />
             </TouchableOpacity>
 
             {showCategories && (
@@ -189,7 +206,7 @@ export default function ResultsScreen() {
                     style={[styles.categoryOption, cat === category && styles.categoryOptionActive]}
                     onPress={() => { setCategory(cat); setShowCategories(false); }}
                   >
-                    <Text style={{ fontSize: 16 }}>{CATEGORY_ICONS[cat]}</Text>
+                    <Ionicons name={CATEGORY_ICONS[cat]} size={18} color={cat === category ? Colors.primary : Colors['on-surface-variant']} />
                     <Text style={[styles.categoryOptionText, cat === category && styles.categoryOptionTextActive]}>
                       {cat}
                     </Text>
@@ -206,7 +223,7 @@ export default function ResultsScreen() {
               onPress={handleLogExpense}
               activeOpacity={0.85}
             >
-              <Text style={styles.primaryBtnIcon}>✓</Text>
+              <Ionicons name="checkmark" size={20} color="#fff" />
               <Text style={styles.primaryBtnText}>Log Expense</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -242,8 +259,7 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
     backgroundColor: Colors['surface-container-low'],
   },
-  backIcon: { fontSize: 20, color: Colors.primary },
-  headerTitle: { fontSize: 18, fontWeight: '700', color: Colors['on-surface'] },
+  headerTitle: { fontSize: 18, fontFamily: Fonts.headline, color: Colors['on-surface'] },
   headerAvatar: {
     width: 38, height: 38,
     borderRadius: 19,
@@ -272,8 +288,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
   },
-  receiptPlaceholderIcon: { fontSize: 48 },
-  receiptPlaceholderText: { fontSize: 14, color: Colors['on-surface-variant'], fontWeight: '500' },
+  receiptPlaceholderText: { fontSize: 14, color: Colors['on-surface-variant'], fontFamily: Fonts.bodyMedium },
   aiBadge: {
     position: 'absolute',
     bottom: 24,
@@ -287,8 +302,7 @@ const styles = StyleSheet.create({
     borderRadius: 99,
     ...Shadows.card,
   },
-  aiBadgeIcon: { fontSize: 14 },
-  aiBadgeText: { fontSize: 11, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase', color: Colors['on-surface'] },
+  aiBadgeText: { fontSize: 11, fontFamily: Fonts.label, letterSpacing: 0.8, textTransform: 'uppercase', color: Colors['on-surface'] },
 
   // Confidence
   confidenceCard: {
@@ -299,7 +313,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   confidenceLabel: {
-    fontSize: 11, fontWeight: '700', textTransform: 'uppercase',
+    fontSize: 11, fontFamily: Fonts.label, textTransform: 'uppercase',
     letterSpacing: 1.2, color: Colors.primary,
   },
   confidenceRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
@@ -316,19 +330,19 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.4, shadowRadius: 6,
   },
-  confidenceValue: { fontSize: 15, fontWeight: '700', color: Colors.primary },
+  confidenceValue: { fontSize: 15, fontFamily: Fonts.headlineExtra, color: Colors.primary },
   confidenceDesc: {
-    fontSize: 13, color: Colors['on-surface-variant'],
+    fontSize: 13, fontFamily: Fonts.body, color: Colors['on-surface-variant'],
     lineHeight: 19,
   },
 
   // Form
   formSection: { marginBottom: 20 },
-  formTagline: { fontSize: 13, fontWeight: '600', color: Colors.primary, letterSpacing: 0.5, marginBottom: 4 },
-  formTitle: { fontSize: 32, fontWeight: '800', letterSpacing: -1, color: Colors['on-surface'] },
+  formTagline: { fontSize: 13, fontFamily: Fonts.headline, color: Colors.primary, letterSpacing: 0.5, marginBottom: 4 },
+  formTitle: { fontSize: 32, fontFamily: Fonts.headlineExtra, letterSpacing: -1, color: Colors['on-surface'] },
 
   fieldGroup: { marginBottom: 20, gap: 8 },
-  fieldLabel: { fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2, color: Colors['on-surface-variant'] },
+  fieldLabel: { fontSize: 11, fontFamily: Fonts.label, textTransform: 'uppercase', letterSpacing: 1.2, color: Colors['on-surface-variant'] },
   fieldRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -338,14 +352,13 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   fieldRowPrimary: { backgroundColor: Colors.primary + '18' },
-  fieldIcon: { fontSize: 18, marginRight: 6 },
   fieldInput: {
     flex: 1, height: 56,
-    fontSize: 17, fontWeight: '600',
+    fontSize: 17, fontFamily: Fonts.bodyMedium,
     color: Colors['on-surface'],
     paddingHorizontal: 8,
   },
-  fieldInputLarge: { fontSize: 22, fontWeight: '800' },
+  fieldInputLarge: { fontSize: 22, fontFamily: Fonts.headlineExtra },
 
   halfRow: { flexDirection: 'row', gap: 12 },
 
@@ -363,9 +376,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors['tertiary-fixed'],
     alignItems: 'center', justifyContent: 'center',
   },
-  categoryName: { fontSize: 17, fontWeight: '800', color: Colors.tertiary },
-  categoryMeta: { fontSize: 12, color: Colors['on-surface-variant'], marginTop: 2 },
-  categoryChevron: { fontSize: 12, color: Colors['on-surface-variant'] },
+  categoryName: { fontSize: 17, fontFamily: Fonts.headlineExtra, color: Colors.tertiary },
+  categoryMeta: { fontSize: 12, fontFamily: Fonts.body, color: Colors['on-surface-variant'], marginTop: 2 },
   categoryPicker: {
     backgroundColor: Colors['surface-container-lowest'],
     borderRadius: BorderRadius.xl,
@@ -378,8 +390,8 @@ const styles = StyleSheet.create({
     padding: 14, paddingHorizontal: 18,
   },
   categoryOptionActive: { backgroundColor: Colors.primary + '12' },
-  categoryOptionText: { fontSize: 15, fontWeight: '600', color: Colors['on-surface'] },
-  categoryOptionTextActive: { color: Colors.primary, fontWeight: '700' },
+  categoryOptionText: { fontSize: 15, fontFamily: Fonts.headline, color: Colors['on-surface'] },
+  categoryOptionTextActive: { color: Colors.primary, fontFamily: Fonts.headlineExtra },
 
   // CTA
   ctaSection: { gap: 12, marginTop: 28 },
@@ -390,14 +402,13 @@ const styles = StyleSheet.create({
     gap: 10,
     ...Shadows.fab,
   },
-  primaryBtnIcon: { fontSize: 20, color: '#fff' },
-  primaryBtnText: { fontSize: 18, fontWeight: '700', color: '#fff' },
+  primaryBtnText: { fontSize: 18, fontFamily: Fonts.headlineExtra, color: '#fff' },
   ghostBtn: {
     alignItems: 'center', justifyContent: 'center',
     paddingVertical: 16,
   },
   ghostBtnText: {
-    fontSize: 13, fontWeight: '600', color: Colors['on-surface-variant'],
+    fontSize: 13, fontFamily: Fonts.label, color: Colors['on-surface-variant'],
     textTransform: 'uppercase', letterSpacing: 1,
   },
 });

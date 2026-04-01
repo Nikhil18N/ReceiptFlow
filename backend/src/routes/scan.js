@@ -86,7 +86,21 @@ router.post('/', requireAuth, upload.single('image'), async (req, res) => {
       });
     }
 
-    // --- 5. Insert into Supabase ---
+    // --- 5. Ensure user profile exists (JIT Sync) ---
+    // This fixes "violates foreign key constraint" error if Clerk webhooks are delayed.
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .upsert(
+        { id: req.userId, updated_at: new Date().toISOString() },
+        { onConflict: 'id' }
+      );
+
+    if (profileError) {
+      console.error('[scan] Profiling upsert error:', profileError);
+      // We don't necessarily want to fail here if it's already there but just for safety.
+    }
+
+    // --- 6. Insert into Supabase ---
     const { data: insertedRow, error: dbError } = await supabase
       .from('expenses')
       .insert([
