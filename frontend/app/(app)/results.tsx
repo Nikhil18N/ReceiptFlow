@@ -63,7 +63,7 @@ export default function ResultsScreen() {
     // This button confirms the user has reviewed and is done.
     Alert.alert(
       '✅ Expense Logged',
-      `"${merchantName}" for $${totalAmount} has been saved to your ledger.`,
+      `"${merchantName}" for ₹ ${totalAmount} has been saved to your ledger.`,
       [
         {
           text: 'View Dashboard',

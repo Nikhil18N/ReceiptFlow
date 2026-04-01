@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { BorderRadius, Colors, Shadows, Fonts } from '../../constants/theme';
 
-const API_BASE_URL = 'https://observer-firmware-necessary-template.trycloudflare.com';
+const API_BASE_URL = 'https://televisions-numerical-pipeline-ver.trycloudflare.com';
 
 const CATEGORIES = ['All', 'Food & Drink', 'Groceries', 'Transport', 'Shopping', 'Travel', 'Entertainment', 'Healthcare', 'Other'];
 
@@ -96,7 +96,7 @@ export default function ActivityScreen() {
         </View>
       </View>
       <View style={styles.expenseRight}>
-        <Text style={styles.expenseAmount}>${Number(item.totalAmount).toFixed(2)}</Text>
+        <Text style={styles.expenseAmount}>₹ {Number(item.totalAmount).toFixed(2)}</Text>
         <View style={styles.categoryBadge}>
           <Text style={styles.categoryBadgeText}>{item.category}</Text>
         </View>

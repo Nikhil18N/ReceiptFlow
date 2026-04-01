@@ -156,4 +156,45 @@ router.get('/stats', requireAuth, async (req, res) => {
   }
 });
 
+/**
+ * GET /api/expenses/export
+ * Returns all user's expenses in CSV format.
+ */
+router.get('/export', requireAuth, async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('expenses')
+      .select('merchant_name, total_amount, date, category, created_at')
+      .eq('user_id', req.userId)
+      .order('date', { ascending: false });
+
+    if (error) {
+      console.error('[expenses/export] Fetch error:', error);
+      return res.status(500).json({ error: 'Failed to fetch data for export.' });
+    }
+
+    // Generate CSV
+    const headers = ['Merchant', 'Amount', 'Date', 'Category', 'Logged At'];
+    const rows = data.map(e => [
+      `"${e.merchant_name.replace(/"/g, '""')}"`,
+      e.total_amount,
+      e.date,
+      `"${e.category}"`,
+      e.created_at
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(r => r.join(','))
+    ].join('\n');
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=expenses.csv');
+    return res.send(csvContent);
+  } catch (err) {
+    console.error('[expenses/export] Unexpected error:', err);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
 module.exports = router;

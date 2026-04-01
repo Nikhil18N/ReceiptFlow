@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Fonts } from '../../constants/theme';
 
-const API_BASE_URL = 'https://observer-firmware-necessary-template.trycloudflare.com';
+const API_BASE_URL = 'https://televisions-numerical-pipeline-ver.trycloudflare.com';
 
 export default function ScannerScreen() {
   const router = useRouter();
@@ -129,6 +129,7 @@ export default function ScannerScreen() {
         ref={cameraRef}
         style={StyleSheet.absoluteFill}
         facing="back"
+        enableTorch={flashMode === 'on'}
         flash={flashMode}
       />
 

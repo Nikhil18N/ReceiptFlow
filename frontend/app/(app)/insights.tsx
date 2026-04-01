@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { BorderRadius, Colors, Shadows, Fonts } from '../../constants/theme';
 
-const API_BASE_URL = 'https://observer-firmware-necessary-template.trycloudflare.com';
+const API_BASE_URL = 'https://televisions-numerical-pipeline-ver.trycloudflare.com';
 
 const CATEGORY_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   'Food & Drink': 'restaurant',
@@ -98,13 +98,13 @@ export default function InsightsScreen() {
           <View style={[styles.summaryCard, styles.summaryPrimary]}>
             <Text style={styles.summaryLabel}>This Month</Text>
             <Text style={styles.summaryAmountWhite}>
-              ${stats?.monthlyTotal?.toFixed(2) ?? '0.00'}
+              ₹ {stats?.monthlyTotal?.toFixed(2) ?? '0.00'}
             </Text>
           </View>
           <View style={styles.summaryCard}>
             <Text style={styles.summaryLabel}>All Time</Text>
             <Text style={styles.summaryAmount}>
-              ${stats?.allTimeTotal?.toFixed(2) ?? '0.00'}
+              ₹ {stats?.allTimeTotal?.toFixed(2) ?? '0.00'}
             </Text>
           </View>
           <View style={styles.summaryCard}>
@@ -120,7 +120,7 @@ export default function InsightsScreen() {
             {stats?.dailyTotals.map((day, i) => (
               <View key={day.date} style={styles.chartColumn}>
                 <Text style={styles.chartBarValue}>
-                  {day.amount > 0 ? `$${day.amount.toFixed(0)}` : ''}
+                  {day.amount > 0 ? `₹ ${day.amount.toFixed(0)}` : ''}
                 </Text>
                 <View style={styles.chartBarBg}>
                   <View
@@ -158,7 +158,7 @@ export default function InsightsScreen() {
                     </View>
                   </View>
                 </View>
-                <Text style={styles.categoryAmount}>${cat.amount.toFixed(2)}</Text>
+                <Text style={styles.categoryAmount}>₹ {cat.amount.toFixed(2)}</Text>
               </View>
             ))
           )}
@@ -176,7 +176,7 @@ export default function InsightsScreen() {
                   <Text style={styles.merchantRankText}>{i + 1}</Text>
                 </View>
                 <Text style={styles.merchantName} numberOfLines={1}>{m.name}</Text>
-                <Text style={styles.merchantAmount}>${m.amount.toFixed(2)}</Text>
+                <Text style={styles.merchantAmount}>₹ {m.amount.toFixed(2)}</Text>
               </View>
             ))
           )}

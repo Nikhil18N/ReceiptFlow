@@ -2,6 +2,7 @@ import { useAuth, useUser } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   Image,
   ScrollView,
@@ -14,12 +15,21 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import * as Sharing from 'expo-sharing';
+import * as FileSystem from 'expo-file-system/legacy';
 import { BorderRadius, Colors, Shadows, Fonts } from '../../constants/theme';
 
+const API_BASE_URL = 'https://televisions-numerical-pipeline-ver.trycloudflare.com';
+
 export default function ProfileScreen() {
-  const { signOut } = useAuth();
+  const { signOut, getToken } = useAuth();
   const { user } = useUser();
   const router = useRouter();
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState(user?.fullName ?? '');
+  const [saving, setSaving] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   const fullName = user?.fullName ?? user?.firstName ?? 'User';
   const email = user?.primaryEmailAddress?.emailAddress ?? '';
@@ -29,7 +39,7 @@ export default function ProfileScreen() {
     : '';
 
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [currency, setCurrency] = useState('USD');
+  const [currency, setCurrency] = useState('INR');
 
   const handleSignOut = () => {
     Alert.alert(
@@ -46,6 +56,65 @@ export default function ProfileScreen() {
         },
       ]
     );
+  };
+
+  const handleUpdateProfile = async () => {
+    if (!editName.trim()) return;
+    try {
+      setSaving(true);
+      // 1. Update Clerk
+      await user?.update({
+        firstName: editName.split(' ')[0],
+        lastName: editName.split(' ').slice(1).join(' '),
+      });
+
+      // 2. Sync to Backend
+      const token = await getToken();
+      await fetch(`${API_BASE_URL}/api/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ fullName: editName }),
+      });
+
+      setIsEditing(false);
+      Alert.alert('Success', 'Profile updated successfully!');
+    } catch (err) {
+      Alert.alert('Error', 'Failed to update profile.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleExportData = async () => {
+    try {
+      setExporting(true);
+      const token = await getToken();
+      const response = await fetch(`${API_BASE_URL}/api/expenses/export`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) throw new Error('Export failed');
+
+      const csvData = await response.text();
+      const fileUri = `${FileSystem.documentDirectory}ReceiptFlow_Expenses.csv`;
+
+      await FileSystem.writeAsStringAsync(fileUri, csvData, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
+
+      await Sharing.shareAsync(fileUri, {
+        mimeType: 'text/csv',
+        dialogTitle: 'Export Expenses',
+        UTI: 'public.comma-separated-values-text',
+      });
+    } catch (err) {
+      Alert.alert('Export Failed', 'Unable to export your data. Please try again.');
+    } finally {
+      setExporting(false);
+    }
   };
 
   return (
@@ -68,7 +137,34 @@ export default function ProfileScreen() {
               </View>
             )}
             <View style={styles.profileInfo}>
-              <Text style={styles.profileName}>{fullName}</Text>
+              {isEditing ? (
+                <View style={styles.editRow}>
+                  <TextInput
+                    style={styles.editInput}
+                    value={editName}
+                    onChangeText={setEditName}
+                    autoFocus
+                    placeholder="Full Name"
+                  />
+                  <TouchableOpacity onPress={handleUpdateProfile} disabled={saving}>
+                    {saving ? (
+                      <ActivityIndicator size="small" color={Colors.primary} />
+                    ) : (
+                      <Ionicons name="checkmark-circle" size={28} color={Colors.primary} />
+                    )}
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => setIsEditing(false)}>
+                    <Ionicons name="close-circle" size={28} color={Colors.outline} />
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <View style={styles.nameRow}>
+                  <Text style={styles.profileName}>{fullName}</Text>
+                  <TouchableOpacity onPress={() => { setEditName(fullName); setIsEditing(true); }}>
+                    <Ionicons name="create-outline" size={18} color={Colors.primary} />
+                  </TouchableOpacity>
+                </View>
+              )}
               <Text style={styles.profileEmail}>{email}</Text>
               <View style={styles.memberBadge}>
                 <Text style={styles.memberBadgeText}>
@@ -95,7 +191,7 @@ export default function ProfileScreen() {
             </View>
             <TouchableOpacity
               style={styles.currencyToggle}
-              onPress={() => setCurrency(currency === 'USD' ? 'INR' : currency === 'INR' ? 'EUR' : 'USD')}
+              disabled
             >
               <Text style={styles.currencyText}>{currency}</Text>
             </TouchableOpacity>
@@ -158,7 +254,8 @@ export default function ProfileScreen() {
         <View style={styles.settingsCard}>
           <TouchableOpacity
             style={styles.settingRow}
-            onPress={() => Alert.alert('Export', 'Export feature coming soon! Your data will be exported as CSV.')}
+            onPress={handleExportData}
+            disabled={exporting}
           >
             <View style={styles.settingLeft}>
               <View style={styles.settingIconWrap}>
@@ -169,7 +266,11 @@ export default function ProfileScreen() {
                 <Text style={styles.settingSubtitle}>Download your expenses as CSV</Text>
               </View>
             </View>
-            <Text style={styles.chevron}>▶</Text>
+            {exporting ? (
+              <ActivityIndicator size="small" color={Colors.primary} />
+            ) : (
+              <Text style={styles.chevron}>▶</Text>
+            )}
           </TouchableOpacity>
         </View>
 
@@ -195,7 +296,6 @@ const styles = StyleSheet.create({
 
   headerTitle: { fontSize: 32, fontFamily: Fonts.headlineExtra, letterSpacing: -1, color: Colors['on-surface'], marginBottom: 20 },
 
-  // Profile card
   profileCard: {
     backgroundColor: Colors['surface-container-lowest'],
     borderRadius: BorderRadius.card,
@@ -212,8 +312,19 @@ const styles = StyleSheet.create({
   },
   avatarInitial: { fontSize: 28, fontFamily: Fonts.headlineExtra, color: '#fff' },
   profileInfo: { flex: 1, gap: 4 },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   profileName: { fontSize: 22, fontFamily: Fonts.headlineExtra, color: Colors['on-surface'] },
   profileEmail: { fontSize: 13, fontFamily: Fonts.body, color: Colors['on-surface-variant'] },
+  editRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  editInput: {
+    flex: 1,
+    fontSize: 18,
+    fontFamily: Fonts.headline,
+    color: Colors['on-surface'],
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.primary,
+    paddingVertical: 4,
+  },
   memberBadge: {
     marginTop: 6,
     alignSelf: 'flex-start',
@@ -223,13 +334,11 @@ const styles = StyleSheet.create({
   },
   memberBadgeText: { fontSize: 11, fontFamily: Fonts.label, color: Colors.primary },
 
-  // Section labels
   sectionLabel: {
     fontSize: 11, fontFamily: Fonts.label, letterSpacing: 1.5, textTransform: 'uppercase',
     color: Colors['on-surface-variant'], marginBottom: 10, paddingLeft: 4,
   },
 
-  // Settings card
   settingsCard: {
     backgroundColor: Colors['surface-container-lowest'],
     borderRadius: BorderRadius.xxl,
@@ -259,7 +368,6 @@ const styles = StyleSheet.create({
   },
   currencyText: { fontSize: 13, fontFamily: Fonts.headline, color: Colors.primary },
 
-  // Sign out
   signOutBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     height: 56, borderRadius: BorderRadius.xl,

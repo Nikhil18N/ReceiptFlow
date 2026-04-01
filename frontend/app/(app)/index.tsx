@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { BorderRadius, Colors, Shadows, Fonts } from '../../constants/theme';
 
-const API_BASE_URL = 'https://observer-firmware-necessary-template.trycloudflare.com';
+const API_BASE_URL = 'https://televisions-numerical-pipeline-ver.trycloudflare.com';
 
 const CATEGORY_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   'Food & Drink': 'restaurant',
@@ -124,7 +124,7 @@ export default function DashboardScreen() {
               <Text style={styles.heroLabel}>This Month's Spending</Text>
               <View style={styles.heroAmountRow}>
                 <Text style={styles.heroAmount}>
-                  ${Math.floor(stats?.monthlyTotal ?? 0).toLocaleString()}
+                  ₹ {Math.floor(stats?.monthlyTotal ?? 0).toLocaleString()}
                 </Text>
                 <Text style={styles.heroAmountCents}>
                   .{((stats?.monthlyTotal ?? 0) % 1).toFixed(2).split('.')[1]}
@@ -145,7 +145,7 @@ export default function DashboardScreen() {
                 ))}
               </View>
               <Text style={styles.heroTrend}>
-                {stats?.totalReceipts ?? 0} receipts scanned • All-time: ${stats?.allTimeTotal?.toFixed(2) ?? '0.00'}
+                {stats?.totalReceipts ?? 0} receipts scanned • All-time: ₹ {stats?.allTimeTotal?.toFixed(2) ?? '0.00'}
               </Text>
             </View>
 
@@ -160,7 +160,7 @@ export default function DashboardScreen() {
                         <Ionicons name={CATEGORY_ICONS[cat.name] ?? 'cube'} size={16} color={Colors.primary} />
                       </View>
                       <Text style={styles.catName}>{cat.name}</Text>
-                      <Text style={styles.catAmount}>${cat.amount.toFixed(0)}</Text>
+                      <Text style={styles.catAmount}>₹ {cat.amount.toFixed(0)}</Text>
                     </View>
                     <View style={styles.progressBg}>
                       <View style={[styles.progressFill, {
@@ -214,7 +214,7 @@ export default function DashboardScreen() {
                     </View>
                   </View>
                   <View style={styles.expenseRight}>
-                    <Text style={styles.expenseAmount}>${Number(item.totalAmount).toFixed(2)}</Text>
+                    <Text style={styles.expenseAmount}>₹ {Number(item.totalAmount).toFixed(2)}</Text>
                     <View style={styles.categoryBadge}>
                       <Text style={styles.categoryBadgeText}>{item.category}</Text>
                     </View>
