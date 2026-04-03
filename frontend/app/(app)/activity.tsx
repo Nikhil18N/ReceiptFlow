@@ -16,7 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BorderRadius, Colors, Shadows, Fonts } from '../../constants/theme';
 import SplitModal from '../../components/SplitModal';
 
-const API_BASE_URL = 'https://shut-dance-essay-pulling.trycloudflare.com';
+import { API_BASE_URL } from '../../constants/api';
 
 const CATEGORIES = ['All', 'Food & Drink', 'Groceries', 'Transport', 'Shopping', 'Travel', 'Entertainment', 'Healthcare', 'Other'];
 

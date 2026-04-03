@@ -17,7 +17,7 @@ import { BorderRadius, Colors, Shadows, Fonts } from '../../constants/theme';
 import BudgetCard from '../../components/BudgetCard';
 import CalendarHeatmap from '../../components/CalendarHeatmap';
 
-const API_BASE_URL = 'https://shut-dance-essay-pulling.trycloudflare.com';
+import { API_BASE_URL } from '../../constants/api';
 
 const CATEGORY_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   'Food & Drink': 'restaurant',

@@ -19,7 +19,7 @@ import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system/legacy';
 import { BorderRadius, Colors, Shadows, Fonts } from '../../constants/theme';
 
-const API_BASE_URL = 'https://shut-dance-essay-pulling.trycloudflare.com';
+import { API_BASE_URL } from '../../constants/api';
 
 export default function ProfileScreen() {
   const { signOut, getToken } = useAuth();

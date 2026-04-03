@@ -9,7 +9,7 @@ import { useAuth } from '@clerk/clerk-expo';
 import { Ionicons } from '@expo/vector-icons';
 import { BorderRadius, Colors, Fonts, Shadows } from '../../constants/theme';
 
-const API_BASE_URL = 'https://shut-dance-essay-pulling.trycloudflare.com';
+import { API_BASE_URL } from '../../constants/api';
 
 type Notification = {
   id: string;

@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Fonts } from '../../constants/theme';
 
-const API_BASE_URL = 'https://shut-dance-essay-pulling.trycloudflare.com';
+import { API_BASE_URL } from '../../constants/api';
 
 export default function ScannerScreen() {
   const router = useRouter();

@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { BorderRadius, Colors, Shadows, Fonts } from '../../constants/theme';
 
-const API_BASE_URL = 'https://shut-dance-essay-pulling.trycloudflare.com';
+import { API_BASE_URL } from '../../constants/api';
 
 const CATEGORY_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   'Food & Drink': 'restaurant',

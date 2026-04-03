@@ -10,7 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BorderRadius, Colors, Fonts, Shadows } from '../../constants/theme';
 import SplitModal from '../../components/SplitModal';
 
-const API_BASE_URL = 'https://shut-dance-essay-pulling.trycloudflare.com';
+import { API_BASE_URL } from '../../constants/api';
 
 const CATEGORY_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   'Food & Drink': 'restaurant',

@@ -5,7 +5,7 @@ import Constants, { AppOwnership } from 'expo-constants';
 import { Platform } from 'react-native';
 import { useAuth } from '@clerk/clerk-expo';
 
-const API_BASE_URL = 'https://shut-dance-essay-pulling.trycloudflare.com';
+import { API_BASE_URL } from '../constants/api';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
