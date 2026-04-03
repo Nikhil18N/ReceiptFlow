@@ -46,10 +46,16 @@
           "cameraPermission": "ReceiptFlow needs camera access to scan your receipts."
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "8bdaf939-5bc5-4d78-b7e6-1d4af853fe21"
+      }
     }
   }
 }

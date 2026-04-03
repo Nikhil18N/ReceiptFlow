@@ -19,7 +19,7 @@ import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system/legacy';
 import { BorderRadius, Colors, Shadows, Fonts } from '../../constants/theme';
 
-const API_BASE_URL = 'https://televisions-numerical-pipeline-ver.trycloudflare.com';
+const API_BASE_URL = 'https://shut-dance-essay-pulling.trycloudflare.com';
 
 export default function ProfileScreen() {
   const { signOut, getToken } = useAuth();
@@ -243,7 +243,7 @@ export default function ProfileScreen() {
               </View>
               <View>
                 <Text style={styles.settingTitle}>Powered by AI</Text>
-                <Text style={styles.settingSubtitle}>Google Gemini 1.5 Flash</Text>
+                <Text style={styles.settingSubtitle}>Google Gemini 2.5 Flash</Text>
               </View>
             </View>
           </View>
@@ -269,7 +269,7 @@ export default function ProfileScreen() {
             {exporting ? (
               <ActivityIndicator size="small" color={Colors.primary} />
             ) : (
-              <Text style={styles.chevron}>▶</Text>
+              <Ionicons name="chevron-forward" size={18} color={Colors['on-surface-variant']} />
             )}
           </TouchableOpacity>
         </View>

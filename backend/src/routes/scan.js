@@ -12,6 +12,9 @@ const upload = multer({ storage: multer.memoryStorage() });
 // Initialize Gemini client
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+const PRIMARY_MODEL = "gemini-2.5-flash";
+const FALLBACK_MODEL = "gemini-2.5-flash-lite";
+
 // Initialize Supabase client with Service Role key (bypasses RLS)
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -25,9 +28,20 @@ The JSON must have exactly these keys:
 - "totalAmount": number — the final total paid (not subtotal, not tax)
 - "date": string — the receipt date in ISO 8601 format (YYYY-MM-DD). If unclear, use today's date.
 - "category": string — one of: "Food & Drink", "Groceries", "Transport", "Shopping", "Travel", "Entertainment", "Healthcare", "Other"
+- "lineItems": array of objects — each object must have "name" (string) and "price" (number). 
+- "returnWindowDays": number — the number of days allowed for returns (e.g. 30). If not found, use 30 as a safe default for major retailers.
+- "warrantyPeriodMonths": number — the warranty period in months. If not found or not applicable, use null.
 
 Example output:
-{"merchantName":"Starbucks","totalAmount":5.45,"date":"2023-11-24","category":"Food & Drink"}`;
+{
+  "merchantName": "Starbucks",
+  "totalAmount": 5.45,
+  "date": "2023-11-24",
+  "category": "Food & Drink",
+  "lineItems": [{"name": "Caramel Macchiato", "price": 4.50}, {"name": "Muffin", "price": 0.95}],
+  "returnWindowDays": 30,
+  "warrantyPeriodMonths": null
+}`;
 
 /**
  * POST /api/scan
@@ -55,11 +69,36 @@ router.post('/', requireAuth, upload.single('image'), async (req, res) => {
       },
     };
 
-    // --- 3. Call Gemini API ---
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    // --- 3. Call Gemini API with Retry & Fallback ---
+    async function getGeminiResponse(imagePart, modelName = PRIMARY_MODEL, retryCount = 0) {
+      try {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const result = await model.generateContent([GEMINI_SYSTEM_PROMPT, imagePart]);
+        return result.response.text();
+      } catch (error) {
+        // If we hit a rate limit (429) or other transient error
+        if (error.status === 429 || error.message?.includes('429')) {
+          console.warn(`[scan] Model ${modelName} hit rate limit (Attempt ${retryCount + 1})`);
+          
+          // Fallback to lite if primary is failing
+          if (modelName === PRIMARY_MODEL && retryCount === 0) {
+            console.log(`[scan] Falling back to ${FALLBACK_MODEL}...`);
+            return getGeminiResponse(imagePart, FALLBACK_MODEL, 0);
+          }
+          
+          if (retryCount < 2) {
+            const delay = Math.pow(2, retryCount) * 10000; // 10s, 20s backoff for quota
+            console.log(`[scan] Retrying ${modelName} in ${delay}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return getGeminiResponse(imagePart, modelName, retryCount + 1);
+          }
+        }
+        throw error;
+      }
+    }
 
-    const result = await model.generateContent([GEMINI_SYSTEM_PROMPT, imagePart]);
-    const responseText = result.response.text().trim();
+    const responseTextRaw = await getGeminiResponse(imagePart);
+    const responseText = responseTextRaw.trim();
 
     console.log('[scan] Gemini raw response:', responseText);
 
@@ -81,13 +120,29 @@ router.post('/', requireAuth, upload.single('image'), async (req, res) => {
     const { merchantName, totalAmount, date, category } = receiptData;
     if (!merchantName || totalAmount === undefined || !date || !category) {
       return res.status(422).json({
-        error: 'AI response is missing required fields.',
+        error: 'AI response is missing required core fields.',
         parsed: receiptData,
       });
     }
 
-    // --- 5. Ensure user profile exists (JIT Sync) ---
-    // This fixes "violates foreign key constraint" error if Clerk webhooks are delayed.
+    // --- 5. Calculate Return and Warranty Dates ---
+    const receiptDateObj = new Date(date);
+    let returnDate = null;
+    let warrantyDate = null;
+
+    if (receiptData.returnWindowDays) {
+      const rd = new Date(receiptDateObj);
+      rd.setDate(rd.getDate() + receiptData.returnWindowDays);
+      returnDate = rd.toISOString();
+    }
+
+    if (receiptData.warrantyPeriodMonths) {
+      const wd = new Date(receiptDateObj);
+      wd.setMonth(wd.getMonth() + receiptData.warrantyPeriodMonths);
+      warrantyDate = wd.toISOString();
+    }
+
+    // --- 6. Ensure user profile exists (JIT Sync) ---
     const { error: profileError } = await supabase
       .from('profiles')
       .upsert(
@@ -97,10 +152,9 @@ router.post('/', requireAuth, upload.single('image'), async (req, res) => {
 
     if (profileError) {
       console.error('[scan] Profiling upsert error:', profileError);
-      // We don't necessarily want to fail here if it's already there but just for safety.
     }
 
-    // --- 6. Insert into Supabase ---
+    // --- 7. Insert into Supabase ---
     const { data: insertedRow, error: dbError } = await supabase
       .from('expenses')
       .insert([
@@ -110,6 +164,9 @@ router.post('/', requireAuth, upload.single('image'), async (req, res) => {
           total_amount: totalAmount,
           date: date,
           category: category,
+          line_items: receiptData.lineItems || [],
+          return_date: returnDate,
+          warranty_date: warrantyDate,
         },
       ])
       .select()
@@ -122,7 +179,23 @@ router.post('/', requireAuth, upload.single('image'), async (req, res) => {
 
     console.log(`[scan] Expense saved: id=${insertedRow.id}`);
 
-    // --- 6. Return success ---
+    // --- 8. Auto-generate notification ---
+    try {
+      await supabase.from('notifications').insert([{
+        user_id: req.userId,
+        type: 'expense_added',
+        title: `✅ Receipt Scanned`,
+        body: `${merchantName} — ₹${Number(totalAmount).toFixed(2)} added to ${category}.`,
+        icon: 'checkmark-circle',
+        color: '#10B981',
+        metadata: JSON.stringify({ expenseId: insertedRow.id }),
+        read: false,
+      }]);
+    } catch (notifErr) {
+      console.error('[scan] Notification insert error (non-fatal):', notifErr);
+    }
+
+    // --- 8. Return success ---
     return res.status(200).json({
       success: true,
       data: {
@@ -131,6 +204,9 @@ router.post('/', requireAuth, upload.single('image'), async (req, res) => {
         totalAmount: insertedRow.total_amount,
         date: insertedRow.date,
         category: insertedRow.category,
+        lineItems: insertedRow.line_items,
+        returnDate: insertedRow.return_date,
+        warrantyDate: insertedRow.warranty_date,
         createdAt: insertedRow.created_at,
       },
     });

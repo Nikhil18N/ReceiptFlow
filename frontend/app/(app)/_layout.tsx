@@ -14,7 +14,8 @@ export default function AppLayout() {
   const { isSignedIn, isLoaded } = useAuth();
   const router = useRouter();
   const segments = useSegments();
-  const isScannerScreen = (segments as string[]).includes('scanner');
+  const currentScreen = (segments as string[])[segments.length - 1] || '';
+  const hideFab = ['scanner', 'expense-detail', 'manual-entry', 'notifications', 'results'].includes(currentScreen);
 
   if (!isLoaded) return null;
 
@@ -93,10 +94,31 @@ export default function AppLayout() {
             href: null,
           }}
         />
+        <Tabs.Screen
+          name="expense-detail"
+          options={{
+            href: null,
+            tabBarStyle: { display: 'none' },
+          }}
+        />
+        <Tabs.Screen
+          name="manual-entry"
+          options={{
+            href: null,
+            tabBarStyle: { display: 'none' },
+          }}
+        />
+        <Tabs.Screen
+          name="notifications"
+          options={{
+            href: null,
+            tabBarStyle: { display: 'none' },
+          }}
+        />
       </Tabs>
 
       {/* Center Scanner FAB */}
-      {!isScannerScreen && (
+      {!hideFab && (
         <TouchableOpacity
           style={styles.centerFab}
           onPress={() => router.push('/(app)/scanner')}

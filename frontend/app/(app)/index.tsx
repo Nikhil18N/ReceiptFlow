@@ -1,6 +1,6 @@
 import { useAuth, useUser } from '@clerk/clerk-expo';
-import { useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useRouter, useFocusEffect } from 'expo-router';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   RefreshControl,
@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { BorderRadius, Colors, Shadows, Fonts } from '../../constants/theme';
 
-const API_BASE_URL = 'https://televisions-numerical-pipeline-ver.trycloudflare.com';
+const API_BASE_URL = 'https://shut-dance-essay-pulling.trycloudflare.com';
 
 const CATEGORY_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   'Food & Drink': 'restaurant',
@@ -26,6 +26,11 @@ const CATEGORY_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   'Healthcare': 'medical',
   'Other': 'cube',
 };
+
+async function safeJsonParse(res: Response) {
+  const text = await res.text();
+  try { return JSON.parse(text); } catch { return null; }
+}
 
 type Stats = {
   monthlyTotal: number;
@@ -51,17 +56,18 @@ export default function DashboardScreen() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const didLoad = useRef(false);
 
   const fetchStats = useCallback(async () => {
     try {
       const token = await getToken();
+      if (!token) return;
       const res = await fetch(`${API_BASE_URL}/api/expenses/stats`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const json = await res.json();
-      if (json.success) {
-        setStats(json.data);
-      }
+      const json = await safeJsonParse(res);
+      if (json?.success) setStats(json.data);
     } catch (err) {
       console.error('Failed to fetch stats:', err);
     } finally {
@@ -70,9 +76,29 @@ export default function DashboardScreen() {
     }
   }, [getToken]);
 
-  useEffect(() => { fetchStats(); }, [fetchStats]);
+  const fetchUnreadCount = useCallback(async () => {
+    try {
+      const token = await getToken();
+      if (!token) return;
+      const res = await fetch(`${API_BASE_URL}/api/notifications/unread-count`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const json = await safeJsonParse(res);
+      if (json?.success) setUnreadCount(json.count);
+    } catch {}
+  }, [getToken]);
 
-  const onRefresh = () => { setRefreshing(true); fetchStats(); };
+  useEffect(() => {
+    if (!didLoad.current) {
+      didLoad.current = true;
+      fetchStats();
+    }
+  }, [fetchStats]);
+
+  // Refresh unread count every time tab is focused
+  useFocusEffect(useCallback(() => { fetchUnreadCount(); }, [fetchUnreadCount]));
+
+  const onRefresh = () => { setRefreshing(true); fetchStats(); fetchUnreadCount(); };
 
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
@@ -94,7 +120,27 @@ export default function DashboardScreen() {
             <Text style={styles.headerName}>{firstName}</Text>
           </View>
         </View>
-        <Text style={styles.brandName}>Receipt Flow</Text>
+        <View style={styles.headerRight}>
+          {/* Quick Add Button */}
+          <TouchableOpacity
+            style={styles.quickAddBtn}
+            onPress={() => router.push('/(app)/manual-entry')}
+          >
+            <Ionicons name="add" size={20} color={Colors.primary} />
+          </TouchableOpacity>
+          {/* Notification Bell */}
+          <TouchableOpacity
+            style={styles.bellBtn}
+            onPress={() => router.push('/(app)/notifications')}
+          >
+            <Ionicons name="notifications-outline" size={20} color={Colors['on-surface']} />
+            {unreadCount > 0 && (
+              <View style={styles.bellBadge}>
+                <Text style={styles.bellBadgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView
@@ -198,12 +244,24 @@ export default function DashboardScreen() {
                 <Ionicons name="receipt-outline" size={48} color={Colors['on-surface-variant']} style={{ marginBottom: 12 }} />
                 <Text style={styles.emptyTitle}>No expenses yet</Text>
                 <Text style={styles.emptySubtitle}>
-                  Tap the camera button below to scan your first receipt
+                  Scan a receipt or add one manually to start tracking
                 </Text>
+                <TouchableOpacity
+                  style={styles.emptyAddBtn}
+                  onPress={() => router.push('/(app)/manual-entry')}
+                >
+                  <Ionicons name="add-circle" size={18} color="#fff" />
+                  <Text style={styles.emptyAddText}>Add Manually</Text>
+                </TouchableOpacity>
               </View>
             ) : (
               stats?.recentExpenses.map((item) => (
-                <View key={item.id} style={styles.expenseCard}>
+                <TouchableOpacity
+                  key={item.id}
+                  style={styles.expenseCard}
+                  onPress={() => router.push({ pathname: '/(app)/expense-detail', params: { id: item.id } })}
+                  activeOpacity={0.7}
+                >
                   <View style={styles.expenseLeft}>
                     <View style={styles.expenseIcon}>
                       <Ionicons name={CATEGORY_ICONS[item.category] ?? 'cube'} size={24} color={Colors.primary} />
@@ -219,7 +277,7 @@ export default function DashboardScreen() {
                       <Text style={styles.categoryBadgeText}>{item.category}</Text>
                     </View>
                   </View>
-                </View>
+                </TouchableOpacity>
               ))
             )}
 
@@ -247,6 +305,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(248,249,250,0.9)',
   },
   headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  headerRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   avatar: {
     width: 40, height: 40, borderRadius: 20,
     backgroundColor: Colors.primary,
@@ -255,7 +314,25 @@ const styles = StyleSheet.create({
   avatarText: { fontSize: 16, fontFamily: Fonts.headline, color: '#fff' },
   headerGreeting: { fontSize: 11, fontFamily: Fonts.body, color: Colors['on-surface-variant'] },
   headerName: { fontSize: 16, fontFamily: Fonts.headline, color: Colors['on-surface'] },
-  brandName: { fontSize: 18, fontFamily: Fonts.headlineExtra, color: Colors.primary, letterSpacing: -0.5 },
+  quickAddBtn: {
+    width: 38, height: 38, borderRadius: 12,
+    backgroundColor: Colors.primary + '12',
+    alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1, borderColor: Colors.primary + '20',
+  },
+  bellBtn: {
+    width: 38, height: 38, borderRadius: 12,
+    backgroundColor: Colors['surface-container-high'],
+    alignItems: 'center', justifyContent: 'center',
+  },
+  bellBadge: {
+    position: 'absolute', top: 2, right: 2,
+    minWidth: 16, height: 16, borderRadius: 8,
+    backgroundColor: Colors.error,
+    alignItems: 'center', justifyContent: 'center',
+    paddingHorizontal: 3,
+  },
+  bellBadgeText: { fontSize: 9, fontFamily: Fonts.headlineExtra, color: '#fff' },
 
   // Hero card
   heroCard: {
@@ -332,7 +409,7 @@ const styles = StyleSheet.create({
   },
   expenseLeft: { flexDirection: 'row', alignItems: 'center', gap: 14, flex: 1 },
   expenseIcon: {
-    width: 52, height: 52, borderRadius: BorderRadius.xl,
+    width: 48, height: 48, borderRadius: BorderRadius.xl,
     backgroundColor: Colors['surface-container-high'],
     alignItems: 'center', justifyContent: 'center',
   },
@@ -354,8 +431,12 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.card, padding: 40,
     alignItems: 'center', ...Shadows.card,
   },
-  emptyIcon: { fontSize: 48, marginBottom: 12 },
   emptyTitle: { fontSize: 18, fontWeight: '700', color: Colors['on-surface'], marginBottom: 8 },
-  emptySubtitle: { fontSize: 14, color: Colors['on-surface-variant'], textAlign: 'center', lineHeight: 20 },
+  emptySubtitle: { fontSize: 14, color: Colors['on-surface-variant'], textAlign: 'center', lineHeight: 20, marginBottom: 16 },
   emptyText: { fontSize: 12, color: Colors['on-surface-variant'], marginTop: 12, fontStyle: 'italic' },
+  emptyAddBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    backgroundColor: Colors.primary, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12,
+  },
+  emptyAddText: { fontSize: 13, fontFamily: Fonts.headline, color: '#fff' },
 });
