@@ -9,13 +9,9 @@ import { Manrope_700Bold, Manrope_800ExtraBold } from '@expo-google-fonts/manrop
 
 SplashScreen.preventAutoHideAsync();
 
-const PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
-
-if (!PUBLISHABLE_KEY) {
-  throw new Error(
-    'Missing EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY. Copy .env.example to .env and add your key.'
-  );
-}
+const PUBLISHABLE_KEY =
+  process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY ||
+  'pk_test_dGlkeS1taWRnZS05NS5jbGVyay5hY2NvdW50cy5kZXYk';
 
 /**
  * Handles automatic redirection based on auth state:

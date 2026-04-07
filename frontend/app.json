@@ -30,7 +30,8 @@
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.WRITE_EXTERNAL_STORAGE"
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "web": {
@@ -53,9 +54,11 @@
       "typedRoutes": true
     },
     "extra": {
+      "router": {},
       "eas": {
-        "projectId": "8bdaf939-5bc5-4d78-b7e6-1d4af853fe21"
+        "projectId": "f4ef08dd-3f27-4c4c-af6a-797b6ee3ff89"
       }
-    }
+    },
+    "owner": "nikhil18n"
   }
 }
