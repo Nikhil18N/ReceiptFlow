@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const https = require('https');
+const http = require('http');
 
 const scanRouter = require('./routes/scan');
 const webhookRouter = require('./routes/webhooks');
@@ -19,6 +21,36 @@ const PORT = process.env.PORT || 3000;
 // Initialize clients for Cron
 const expo = new Expo();
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+// ── Render Keep-Alive (Every 14 minutes) ────────────────────────────────────
+// Render free-tier services spin down after 15 min of inactivity.
+// This self-ping keeps the server awake. Uses RENDER_EXTERNAL_HOSTNAME
+// which Render injects automatically — no config needed in production.
+cron.schedule('*/14 * * * *', () => {
+  const host = process.env.RENDER_EXTERNAL_HOSTNAME;
+  if (!host) return; // Skip in local dev
+
+  const url = `https://${host}/health`;
+  const client = url.startsWith('https') ? https : http;
+
+  client.get(url, (res) => {
+    console.log(`[render-ping] Self-ping ${url} → ${res.statusCode}`);
+  }).on('error', (err) => {
+    console.error('[render-ping] Self-ping failed:', err.message);
+  });
+});
+
+// ── Keep-Alive Ping (Every 3 days at 6:00 AM) ───────────────────────────────
+// Prevents Supabase free-tier project from auto-pausing due to inactivity.
+cron.schedule('0 6 */3 * *', async () => {
+  try {
+    const { error } = await supabase.from('profiles').select('id').limit(1);
+    if (error) throw error;
+    console.log('[keep-alive] Supabase ping successful.');
+  } catch (err) {
+    console.error('[keep-alive] Supabase ping failed:', err.message);
+  }
+});
 
 // ── Daily Cron Job (8:00 AM) ──────────────────────────────────────────────────
 cron.schedule('0 8 * * *', async () => {
