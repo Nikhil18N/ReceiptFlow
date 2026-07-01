@@ -134,7 +134,9 @@ app.use((err, req, res, next) => {
 });
 
 // ── Start ─────────────────────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`✅ ReceiptFlow API is running on http://localhost:${PORT}`);
-  console.log(`   Health check: http://localhost:${PORT}/health`);
+// Bind to 0.0.0.0 (all interfaces) so Render's health checker can reach the port.
+// Defaulting to localhost (127.0.0.1) causes "port scan timeout" on Render.
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ ReceiptFlow API is running on http://0.0.0.0:${PORT}`);
+  console.log(`   Health check: http://0.0.0.0:${PORT}/health`);
 });
