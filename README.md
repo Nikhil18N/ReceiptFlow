@@ -25,11 +25,37 @@
   <img src="https://img.shields.io/badge/Google_Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Google Gemini" />
 </p>
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [API Reference](#api-reference)
+- [Screenshots](#screenshots)
+- [Deployment](#deployment)
+- [Cron Jobs](#cron-jobs)
+- [Environment Variables Reference](#environment-variables-reference)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Why ReceiptFlow?
+
+ReceiptFlow brings receipt scanning, expense organization, and financial insights into one polished mobile experience. Instead of manually typing every purchase, you can capture a receipt, let AI extract the important details, and immediately review your spending habits in a clean dashboard.
+
+### Quick Start at a Glance
+
+- Capture a receipt with your camera or upload one from your gallery
+- Extract merchant, totals, line items, category, and return details with AI
+- Review your spending in the dashboard and manage budgets and alerts
+- Sync everything through a secure backend and keep your data organized
+
 ---
 
 ## Overview
 
-**ReceiptFlow** is a full-stack mobile application that turns physical receipts into structured, searchable financial data — instantly. Point your camera at any receipt and let Google Gemini's AI extract merchant name, total amount, line items, category, return window, and warranty details automatically. All your spending data lives in one beautiful, insight-driven dashboard.
+**ReceiptFlow** is a full-stack mobile application that turns physical receipts into structured, searchable financial data — instantly. Point your camera at any receipt and let Google Gemini's AI extract merchant name, total amount, line items, category, return window, and warranty details automatically. All your spending data lives in one beautiful, insight-driven dashboard designed to make expense tracking feel effortless.
 
 ---
 
@@ -378,6 +404,8 @@ Three scheduled tasks run on the backend:
 3. Commit your changes: `git commit -m 'Add some amazing feature'`
 4. Push to the branch: `git push origin feature/amazing-feature`
 5. Open a Pull Request
+
+Contributions are welcome. Whether you want to fix a bug, improve the UX, or add a new feature, your help is appreciated.
 
 ---
 
